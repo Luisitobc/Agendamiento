@@ -184,10 +184,10 @@ def main(argv):
         w = csv.writer(f)
         w.writerow(["fila", "resultado", "detalle", "nombre"])
         w.writerows(informe)
-    print(("APLICADO" if aplicar else "PRUEBA (no se guardó nada)"), resumen)
+    print(("APLICADO" if aplicar else " PRUEBA (no se gurado) "), resumen)
     print("Informe:", salida)
     return 0
 
 
-if __name__ == "__main__":
+if __name__ == " main":
     sys.exit(main(sys.argv[1:]))
