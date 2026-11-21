@@ -1,7 +1,7 @@
-# DECISIONES — MSLS+ / ClinAgenda
+# DECISIONES de MSLS+ / ClinAgenda
 
-Este archivo dice **qué se resolvió y cómo, qué se dejó fuera y por qué, y qué se supuso** que la Dra. Paredes necesitaba.
-Estado de cada punto: ✅ resuelto y con prueba automática · 🟡 resuelto a medias · ⬜ no resuelto (con el plan).
+Este archivo dice **Que se resolvió y cómo, qué se dejó fuera y por qué, y qué se supuso** que la Dra. Paredes necesitaba.
+Estado de cada punto: ✅ resuelto y con prueba automática , 🟡 resuelto a medias , ⬜ no resuelto (con el plan).
 
 > **Para completar por el equipo antes del viernes** (solo ustedes pueden): integrantes y quién hizo qué, la prueba con una persona no técnica (sección 6), el cambio de plan (sección 8) y las preguntas enviadas a la clienta (sección 9). Están marcados con **[COMPLETAR]**.
 
