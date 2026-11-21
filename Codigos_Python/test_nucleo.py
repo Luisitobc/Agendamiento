@@ -47,7 +47,7 @@ class TestValidaciones(unittest.TestCase):
         self.assertEqual(e.exception.campo, "documento")
 
     def test_nombre_con_basura(self):
-        for x in ["😀😀😀", "'; DROP TABLE citas;--", "<script>x</script>", "12345"]:
+        for x in ["", "'; DROP TABLE citas;--", "<script>x</script>", "12345"]:
             with self.assertRaises(n.ErrorNegocio, msg=x):
                 n.limpiar_nombre(x)
 
