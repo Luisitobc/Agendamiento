@@ -28,7 +28,7 @@ class TestImportar(unittest.TestCase):
         self.assertEqual(self.con.execute("SELECT COUNT(*) FROM pacientes").fetchone()[0],
                          resumen["importados"] + resumen["con_avisos"])
         resultados = {fila[3].strip(): fila[1] for fila in informe}
-        self.assertEqual(resultados["😀😀"], "rechazada")            # nombre inválido
+        self.assertEqual(resultados[" "], "rechazada")            # nombre inválido
         self.assertEqual(resultados["Luis Mora"], "rechazada")        # nacido en 2090
         self.assertEqual(resultados["Juan  PÉREZ"], "posible duplicado")
 
@@ -71,5 +71,5 @@ class TestImportar(unittest.TestCase):
             imp.leer_filas(b"Telefono,Correo\n099,a@b.com\n")
 
 
-if __name__ == "__main__":
+if __name__ == " main ":
     unittest.main()
