@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 
 def conectar(ruta=":memory:"):
-    """Abre la base (la crea o actualiza si hace falta) y devuelve la conexión. Se usa una conexión por petición."""
+    """Abre la base ( crea o actualiza si hace falta) y devuelve la conexión. Se usa una conexión por petición."""
     con = sqlite3.connect(ruta, isolation_level=None, timeout=10)  # transacciones manuales
     con.row_factory = sqlite3.Row
     con.execute("PRAGMA journal_mode = WAL")   # leer no bloquea a escribir; más seguro ante cortes
@@ -128,7 +128,7 @@ def _auditar(con, usuario, accion, entidad, entidad_id, detalle=""):
          entidad, entidad_id, detalle))
 
 
-# ----------------------------------------------------------------- Validaciones
+# Validaciones
 def normalizar_espacios(texto):
     """Quita espacios de más: '  Ana   Gil ' queda 'Ana Gil'."""
     return re.sub(r"\s+", " ", (texto or "")).strip()
