@@ -1,623 +1,1332 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clínica MSLS+ · Agenda de citas</title>
-<style>
-:root{
-  --tinta:#14292b;--suave:#53676a;--linea:#cddcdc;--fondo:#eaf3f4;--papel:#fff;
-  --teal:#0f4c4e;--teal2:#15696b;--menta:#d9ebe8;--cielo:#3d7ea6;--oro:#c79a3b;
-  --peligro:#a2392f;--peligro-f:#fbeceb;--aviso:#f3e8c4;
-  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-  --sans:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
-}
-*{box-sizing:border-box}
-html{font-size:18px}
-body{margin:0;min-height:100vh;background:var(--fondo);color:var(--tinta);font-family:var(--sans);line-height:1.5}
-h1,h2,h3{margin:0;line-height:1.15}
-.oculto{display:none!important}
-svg.ic{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clínica MSLS+ · Agenda de citas</title>
+  <style>
+    :root {
+      --tinta: #14292b;
+      --suave: #53676a;
+      --linea: #cddcdc;
+      --fondo: #eaf3f4;
+      --papel: #fff;
+      --teal: #0f4c4e;
+      --teal2: #15696b;
+      --menta: #d9ebe8;
+      --cielo: #3d7ea6;
+      --oro: #c79a3b;
+      --peligro: #a2392f;
+      --peligro-f: #fbeceb;
+      --aviso: #f3e8c4;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      --sans: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    }
 
-/* ===== PORTADA ===== */
-.portada{min-height:100vh;background:#e4efee url('fondo_suave.svg') center/cover no-repeat}
-.p-nav{max-width:1120px;margin:0 auto;padding:22px 28px;display:flex;justify-content:space-between;align-items:center}
-.marca-mini{font-family:var(--serif);font-weight:700;font-size:1.35rem;color:var(--teal)}
-.marca-mini b{color:var(--oro)}
-.p-nav button{background:none;border:1.5px solid var(--teal);color:var(--teal);border-radius:10px;font:inherit;min-height:44px;padding:0 18px;cursor:pointer}
-.p-nav button:hover{background:var(--teal);color:#fff}
-.hero{max-width:1120px;margin:0 auto;padding:36px 28px 28px;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
-.hero .saludo{margin:0 0 10px;color:var(--teal2);font-weight:650}
-.hero h1{font-family:var(--serif);font-size:3.5rem;font-weight:700;color:var(--teal);letter-spacing:-.015em}
-.hero h1 em{font-style:normal;color:var(--oro)}
-.hero p.lead{font-size:1.1rem;color:var(--suave);max-width:34ch;margin:18px 0 28px}
-.acciones{display:flex;gap:12px;flex-wrap:wrap}
-.btn{min-height:54px;border:0;border-radius:12px;background:var(--teal);color:#fff;font:inherit;font-weight:650;font-size:1.02rem;padding:0 28px;cursor:pointer;display:inline-flex;gap:10px;align-items:center;justify-content:center}
-.btn:hover{background:var(--teal2)}
-.btn:disabled{opacity:.6;cursor:wait}
-.btn.sec{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}
-.btn.sec:hover{background:var(--menta)}
-.btn.bloque{width:100%;margin-top:22px}
+    * { box-sizing: border-box; }
+    html { font-size: 18px; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--fondo);
+      color: var(--tinta);
+      font-family: var(--sans);
+      line-height: 1.5;
+    }
+    h1, h2, h3 { margin: 0; line-height: 1.15; }
+    .oculto { display: none !important; }
+    svg.ic {
+      width: 1.25em;
+      height: 1.25em;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex: none;
+    }
 
-.maqueta{position:relative;padding:10px 0 30px 20px}
-.m-card{background:var(--papel);border-radius:18px;box-shadow:0 18px 40px rgba(15,76,78,.14);padding:20px 22px}
-.m-cab{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.m-cab b{font-family:var(--serif);font-size:1.15rem;color:var(--teal)}
-.m-ok{font-size:.78rem;background:var(--menta);color:var(--teal);padding:3px 10px;border-radius:999px}
-.m-fila{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--linea)}
-.m-fila time{font-weight:700;color:var(--teal)}
-.m-fila small{display:block;color:var(--suave)}
-.punto{width:10px;height:10px;border-radius:50%;background:var(--teal2)}
-.punto.n{background:var(--cielo)}.punto.s{background:var(--oro)}
-.m-flota{position:absolute;left:-6px;bottom:0;background:var(--teal);color:#fff;border-radius:14px;padding:12px 16px;font-size:.9rem;display:flex;gap:10px;align-items:center;box-shadow:0 12px 28px rgba(15,76,78,.28)}
-.m-flota u{color:#f3d68a;text-underline-offset:3px}
+    /* ===== PORTADA ===== */
+    .portada {
+      min-height: 100vh;
+      background: #e4efee url('fondo_suave.svg') center/cover no-repeat;
+    }
+    .p-nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 22px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .marca-mini {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: var(--teal);
+    }
+    .marca-mini b { color: var(--oro); }
+    .p-nav button {
+      background: none;
+      border: 1.5px solid var(--teal);
+      color: var(--teal);
+      border-radius: 10px;
+      font: inherit;
+      min-height: 44px;
+      padding: 0 18px;
+      cursor: pointer;
+    }
+    .p-nav button:hover { background: var(--teal); color: #fff; }
 
-.sedes{max-width:1120px;margin:0 auto;padding:8px 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.sede{background:rgba(255,255,255,.82);border:1px solid var(--linea);border-radius:16px;padding:18px 20px;display:flex;gap:14px;align-items:center}
-.sede .punto{width:14px;height:14px}
-.sede b{display:block;font-family:var(--serif);font-size:1.1rem}
-.sede small{color:var(--suave)}
-.pilares{max-width:1120px;margin:0 auto;padding:16px 28px 56px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.pilar{background:var(--teal);color:#e9f4f2;border-radius:18px;padding:26px 28px}
-.pilar:nth-child(2){background:var(--papel);color:var(--tinta);border:1px solid var(--linea)}
-.pilar h2{font-family:var(--serif);font-size:1.4rem;margin-bottom:8px}
-.pilar:nth-child(2) h2{color:var(--teal)}
-.pilar p{margin:0}
+    .hero {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 36px 28px 28px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .hero .saludo { margin: 0 0 10px; color: var(--teal2); font-weight: 650; }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--teal);
+      letter-spacing: -0.015em;
+    }
+    .hero h1 em { font-style: normal; color: var(--oro); }
+    .hero p.lead {
+      font-size: 1.1rem;
+      color: var(--suave);
+      max-width: 34ch;
+      margin: 18px 0 28px;
+    }
+    .acciones { display: flex; gap: 12px; flex-wrap: wrap; }
 
-/* ===== SISTEMA ===== */
-.app{display:grid;grid-template-columns:270px 1fr;min-height:100vh}
-aside{background:var(--teal);color:#e6f2f0;padding:26px 16px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
-.logo{font-family:var(--serif);font-weight:700;font-size:1.45rem;padding:0 12px 22px;color:#fff}
-.logo b{color:#f3d68a}
-nav button{width:100%;display:flex;gap:12px;align-items:center;text-align:left;background:transparent;border:0;color:#cfe5e2;font:inherit;padding:13px 14px;border-radius:12px;cursor:pointer}
-nav button:hover{background:rgba(255,255,255,.09)}
-nav button.on{background:#fff;color:var(--teal);font-weight:650}
-.usuario{margin-top:auto;padding:14px 10px 0;border-top:1px solid rgba(255,255,255,.18)}
-.usuario label{color:#b9d6d2}
-aside .btn-volver{margin-top:10px;background:none;border:0;color:#b9d6d2;font:inherit;font-size:.9rem;cursor:pointer;text-align:left;padding:8px 14px;text-decoration:underline;text-underline-offset:3px}
+    .btn {
+      min-height: 54px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--teal);
+      color: #fff;
+      font: inherit;
+      font-weight: 650;
+      font-size: 1.02rem;
+      padding: 0 28px;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn:hover { background: var(--teal2); }
+    .btn:disabled { opacity: 0.6; cursor: wait; }
+    .btn.sec { background: #fff; color: var(--teal); border: 1.5px solid var(--teal); }
+    .btn.sec:hover { background: var(--menta); }
+    .btn.bloque { width: 100%; margin-top: 22px; }
 
-main{padding:30px 34px 64px;max-width:1040px;width:100%;margin:0 auto}
-.cab{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-.cab h1{font-family:var(--serif);font-size:2rem;color:var(--teal)}
-.cab p{margin:6px 0 0;color:var(--suave);max-width:54ch}
-.fecha-hoy{font-size:.9rem;color:var(--teal2);background:var(--menta);padding:6px 14px;border-radius:999px;text-transform:capitalize;white-space:nowrap}
+    .maqueta { position: relative; padding: 10px 0 30px 20px; }
+    .m-card {
+      background: var(--papel);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(15, 76, 78, 0.14);
+      padding: 20px 22px;
+    }
+    .m-cab {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .m-cab b { font-family: var(--serif); font-size: 1.15rem; color: var(--teal); }
+    .m-ok {
+      font-size: 0.78rem;
+      background: var(--menta);
+      color: var(--teal);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .m-fila {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 0;
+      border-top: 1px solid var(--linea);
+    }
+    .m-fila time { font-weight: 700; color: var(--teal); }
+    .m-fila small { display: block; color: var(--suave); }
+    .punto { width: 10px; height: 10px; border-radius: 50%; background: var(--teal2); }
+    .punto.n { background: var(--cielo); }
+    .punto.s { background: var(--oro); }
+    .m-flota {
+      position: absolute;
+      left: -6px;
+      bottom: 0;
+      background: var(--teal);
+      color: #fff;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 12px 28px rgba(15, 76, 78, 0.28);
+    }
+    .m-flota u { color: #f3d68a; text-underline-offset: 3px; }
 
-label{display:block;font-size:.88rem;color:var(--suave);margin:16px 0 6px}
-input,select{width:100%;min-height:50px;font:inherit;color:var(--tinta);background:#fff;border:1.5px solid #aebfc0;border-radius:10px;padding:8px 14px}
-input::placeholder{color:#7d8d90}
-input:focus,select:focus,button:focus-visible{outline:3px solid #7fb6b8;outline-offset:2px}
-input[aria-invalid="true"],select[aria-invalid="true"]{border-color:var(--peligro);background:var(--peligro-f)}
-.ayuda{display:block;font-size:.8rem;color:var(--suave);margin-top:4px}
-aside select{background:rgba(255,255,255,.95)}
+    .sedes {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 8px 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .sede {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--linea);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .sede .punto { width: 14px; height: 14px; }
+    .sede b { display: block; font-family: var(--serif); font-size: 1.1rem; }
+    .sede small { color: var(--suave); }
 
-.card{background:var(--papel);border:1px solid var(--linea);border-radius:16px;padding:24px;margin-bottom:14px}
-.card h3{font-family:var(--serif);font-size:1.15rem;color:var(--teal);margin-bottom:2px}
-.fila{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.dos{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
-.resumen{background:var(--menta);border:0;position:sticky;top:20px}
-.resumen dl{margin:14px 0 0}
-.resumen dt{font-size:.8rem;color:var(--teal2);margin-top:12px}
-.resumen dd{margin:2px 0 0;font-weight:650}
-.resumen dd.vacio-r{color:#7a9a97;font-weight:400}
+    .pilares {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 16px 28px 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .pilar {
+      background: var(--teal);
+      color: #e9f4f2;
+      border-radius: 18px;
+      padding: 26px 28px;
+    }
+    .pilar:nth-child(2) {
+      background: var(--papel);
+      color: var(--tinta);
+      border: 1px solid var(--linea);
+    }
+    .pilar h2 { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 8px; }
+    .pilar:nth-child(2) h2 { color: var(--teal); }
+    .pilar p { margin: 0; }
 
-.chico{min-height:44px;padding:0 18px;border-radius:10px;border:1.5px solid var(--linea);background:#fff;color:var(--tinta);font:inherit;cursor:pointer}
-.chico:hover{background:var(--menta)}
-.chico.peligro{border-color:#d9a8a3;color:var(--peligro)}
-.chico.peligro:hover{background:var(--peligro-f)}
-.chico.ok{border-color:var(--teal);color:var(--teal)}
-.error{background:var(--peligro-f);border:1.5px solid #d9a8a3;color:#6e231c;border-radius:10px;padding:12px 16px;margin-top:16px}
-.error:empty{display:none}
+    /* ===== SISTEMA ===== */
+    .app { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; }
+    aside {
+      background: var(--teal);
+      color: #e6f2f0;
+      padding: 26px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .logo {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 1.45rem;
+      padding: 0 12px 22px;
+      color: #fff;
+    }
+    .logo b { color: #f3d68a; }
+    nav button {
+      width: 100%;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      color: #cfe5e2;
+      font: inherit;
+      padding: 13px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    nav button:hover { background: rgba(255, 255, 255, 0.09); }
+    nav button.on { background: #fff; color: var(--teal); font-weight: 650; }
 
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:6px}
-.stat{background:var(--papel);border:1px solid var(--linea);border-radius:14px;padding:14px 18px}
-.stat b{display:block;font-family:var(--serif);font-size:1.9rem;color:var(--teal);line-height:1.1}
-.stat span{font-size:.85rem;color:var(--suave)}
-.dia{margin:26px 2px 10px;font-family:var(--serif);font-size:1.15rem;font-weight:700;text-transform:capitalize;color:var(--teal)}
-.cita{display:flex;gap:16px;align-items:center;flex-wrap:wrap;border-left:6px solid var(--teal2);padding:16px 20px}
-.cita.norte{border-left-color:var(--cielo)}.cita.sur{border-left-color:var(--oro)}
-.hora{font-family:var(--serif);font-size:1.5rem;font-weight:700;min-width:80px;color:var(--teal)}
-.info{flex:1;min-width:180px}
-.info small{color:var(--suave);display:block}
-.chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.78rem;margin-left:8px;background:var(--aviso);color:#4d4220}
-.cita.cancelada{background:#f3f6f6;border-left-color:#b6c4c4}
-.cancelada .hora,.cancelada .info b{text-decoration:line-through;color:var(--suave)}
-.vacio{text-align:center;color:var(--suave);padding:40px 10px}
-.pac{display:flex;gap:14px;align-items:center;padding:14px 18px}
-.avatar{width:42px;height:42px;border-radius:50%;background:var(--menta);color:var(--teal);display:grid;place-items:center;font-weight:700;flex:none}
-.pac small{display:block;color:var(--suave);font-size:.88rem}
+    .usuario {
+      margin-top: auto;
+      padding: 14px 10px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .usuario label { color: #b9d6d2; }
+    aside .btn-volver {
+      margin-top: 10px;
+      background: none;
+      border: 0;
+      color: #b9d6d2;
+      font: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      padding: 8px 14px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
 
-#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--tinta);color:#fff;padding:12px 20px;border-radius:12px;display:flex;gap:16px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.22);z-index:9;max-width:92vw}
-#toast button{background:none;border:0;color:#a9dcdc;font:inherit;font-weight:700;cursor:pointer;min-height:40px}
+    main {
+      padding: 30px 34px 64px;
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .cab {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .cab h1 { font-family: var(--serif); font-size: 2rem; color: var(--teal); }
+    .cab p { margin: 6px 0 0; color: var(--suave); max-width: 54ch; }
+    .fecha-hoy {
+      font-size: 0.9rem;
+      color: var(--teal2);
+      background: var(--menta);
+      padding: 6px 14px;
+      border-radius: 999px;
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
 
-@media (max-width:900px){
-  .hero{grid-template-columns:1fr;gap:28px}.hero h1{font-size:2.7rem}
-  .sedes,.pilares{grid-template-columns:1fr}
-  .dos{grid-template-columns:1fr}.resumen{position:static;order:-1}
-}
-@media (max-width:820px){
-  .app{grid-template-columns:1fr}
-  aside{position:fixed;bottom:0;left:0;right:0;top:auto;height:auto;flex-direction:row;padding:6px;z-index:5}
-  .logo,.usuario,aside .btn-volver{display:none}
-  nav{display:flex;width:100%;gap:6px}
-  nav button{flex-direction:column;gap:2px;justify-content:center;font-size:.8rem;padding:8px 4px;text-align:center}
-  main{padding:22px 14px 120px}
-  .fila,.stats{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}
-  #toast{bottom:100px}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
-.aviso-pend{background:var(--aviso);border:1.5px solid var(--oro);border-radius:14px;padding:14px 18px;margin-bottom:18px}
-.aviso-pend small{display:block;margin:4px 0 10px;color:#4d4220}
-.pend-fila{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:8px 0;border-top:1px solid rgba(0,0,0,.12)}
-.pend-fila em{color:var(--peligro);font-style:normal}
-#login{position:fixed;inset:0;background:rgba(20,41,43,.75);display:grid;place-items:center;z-index:20;padding:16px}
-.login-card{width:min(420px,100%);margin:0}
-.login-card h2{font-family:var(--serif);color:var(--teal);margin-bottom:4px}
-.u-nombre{display:block;font-size:.9rem;color:#fff;margin-bottom:2px}
-.u-rol{display:block;font-size:.78rem;color:#b9d6d2}
-.evento{display:grid;grid-template-columns:150px 1fr;gap:4px 16px;padding:12px 18px}
-.evento time{color:var(--suave);font-size:.88rem}
-.evento small{color:var(--suave);grid-column:2}
-.evento.malo{border-left:5px solid var(--peligro)}
-@media (max-width:820px){.evento{grid-template-columns:1fr}.evento small{grid-column:1}}
-</style>
+    label { display: block; font-size: 0.88rem; color: var(--suave); margin: 16px 0 6px; }
+    input, select {
+      width: 100%;
+      min-height: 50px;
+      font: inherit;
+      color: var(--tinta);
+      background: #fff;
+      border: 1.5px solid #aebfc0;
+      border-radius: 10px;
+      padding: 8px 14px;
+    }
+    input::placeholder { color: #7d8d90; }
+    input:focus, select:focus, button:focus-visible {
+      outline: 3px solid #7fb6b8;
+      outline-offset: 2px;
+    }
+    input[aria-invalid="true"], select[aria-invalid="true"] {
+      border-color: var(--peligro);
+      background: var(--peligro-f);
+    }
+    .ayuda { display: block; font-size: 0.8rem; color: var(--suave); margin-top: 4px; }
+    aside select { background: rgba(255, 255, 255, 0.95); }
+
+    .card {
+      background: var(--papel);
+      border: 1px solid var(--linea);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 14px;
+    }
+    .card h3 {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      color: var(--teal);
+      margin-bottom: 2px;
+    }
+    .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .dos { display: grid; grid-template-columns: 1fr 320px; gap: 18px; align-items: start; }
+    .resumen { background: var(--menta); border: 0; position: sticky; top: 20px; }
+    .resumen dl { margin: 14px 0 0; }
+    .resumen dt { font-size: 0.8rem; color: var(--teal2); margin-top: 12px; }
+    .resumen dd { margin: 2px 0 0; font-weight: 650; }
+    .resumen dd.vacio-r { color: #7a9a97; font-weight: 400; }
+
+    .chico {
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 10px;
+      border: 1.5px solid var(--linea);
+      background: #fff;
+      color: var(--tinta);
+      font: inherit;
+      cursor: pointer;
+    }
+    .chico:hover { background: var(--menta); }
+    .chico.peligro { border-color: #d9a8a3; color: var(--peligro); }
+    .chico.peligro:hover { background: var(--peligro-f); }
+    .chico.ok { border-color: var(--teal); color: var(--teal); }
+
+    .error {
+      background: var(--peligro-f);
+      border: 1.5px solid #d9a8a3;
+      color: #6e231c;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-top: 16px;
+    }
+    .error:empty { display: none; }
+
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 6px; }
+    .stat {
+      background: var(--papel);
+      border: 1px solid var(--linea);
+      border-radius: 14px;
+      padding: 14px 18px;
+    }
+    .stat b {
+      display: block;
+      font-family: var(--serif);
+      font-size: 1.9rem;
+      color: var(--teal);
+      line-height: 1.1;
+    }
+    .stat span { font-size: 0.85rem; color: var(--suave); }
+
+    .dia {
+      margin: 26px 2px 10px;
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: capitalize;
+      color: var(--teal);
+    }
+    .cita {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-left: 6px solid var(--teal2);
+      padding: 16px 20px;
+    }
+    .cita.norte { border-left-color: var(--cielo); }
+    .cita.sur { border-left-color: var(--oro); }
+    .hora {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      min-width: 80px;
+      color: var(--teal);
+    }
+    .info { flex: 1; min-width: 180px; }
+    .info small { color: var(--suave); display: block; }
+    .chip {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      margin-left: 8px;
+      background: var(--aviso);
+      color: #4d4220;
+    }
+    .cita.cancelada { background: #f3f6f6; border-left-color: #b6c4c4; }
+    .cancelada .hora, .cancelada .info b {
+      text-decoration: line-through;
+      color: var(--suave);
+    }
+    .vacio { text-align: center; color: var(--suave); padding: 40px 10px; }
+
+    .pac { display: flex; gap: 14px; align-items: center; padding: 14px 18px; }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--menta);
+      color: var(--teal);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      flex: none;
+    }
+    .pac small { display: block; color: var(--suave); font-size: 0.88rem; }
+
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 90px;
+      transform: translateX(-50%);
+      background: var(--tinta);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+      z-index: 9;
+      max-width: 92vw;
+    }
+    #toast button {
+      background: none;
+      border: 0;
+      color: #a9dcdc;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 40px;
+    }
+
+    .aviso-pend {
+      background: var(--aviso);
+      border: 1.5px solid var(--oro);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+    .aviso-pend small { display: block; margin: 4px 0 10px; color: #4d4220; }
+    .pend-fila {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.12);
+    }
+    .pend-fila em { color: var(--peligro); font-style: normal; }
+
+    #login {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 41, 43, 0.75);
+      display: grid;
+      place-items: center;
+      z-index: 20;
+      padding: 16px;
+    }
+    .login-card { width: min(420px, 100%); margin: 0; }
+    .login-card h2 { font-family: var(--serif); color: var(--teal); margin-bottom: 4px; }
+    .u-nombre { display: block; font-size: 0.9rem; color: #fff; margin-bottom: 2px; }
+    .u-rol { display: block; font-size: 0.78rem; color: #b9d6d2; }
+
+    .evento { display: grid; grid-template-columns: 150px 1fr; gap: 4px 16px; padding: 12px 18px; }
+    .evento time { color: var(--suave); font-size: 0.88rem; }
+    .evento small { color: var(--suave); grid-column: 2; }
+    .evento.malo { border-left: 5px solid var(--peligro); }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 28px; }
+      .hero h1 { font-size: 2.7rem; }
+      .sedes, .pilares { grid-template-columns: 1fr; }
+      .dos { grid-template-columns: 1fr; }
+      .resumen { position: static; order: -1; }
+    }
+    @media (max-width: 820px) {
+      .app { grid-template-columns: 1fr; }
+      aside {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        height: auto;
+        flex-direction: row;
+        padding: 6px;
+        z-index: 5;
+      }
+      .logo, .usuario, aside .btn-volver { display: none; }
+      nav { display: flex; width: 100%; gap: 6px; }
+      nav button {
+        flex-direction: column;
+        gap: 2px;
+        justify-content: center;
+        font-size: 0.8rem;
+        padding: 8px 4px;
+        text-align: center;
+      }
+      main { padding: 22px 14px 120px; }
+      .fila { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      #toast { bottom: 100px; }
+      .evento { grid-template-columns: 1fr; }
+      .evento small { grid-column: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
- <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
- <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></symbol>
- <symbol id="i-users" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-3.6 3.4-5.5 7-5.5s6.3 1.9 7 5.5"/></symbol>
- <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></symbol>
- <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
-</defs></svg>
+  <!-- Sprite de íconos SVG -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-3.6 3.4-5.5 7-5.5s6.3 1.9 7 5.5"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></symbol>
+      <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    </defs>
+  </svg>
 
-<!-- ===== PORTADA ===== -->
-<div id="vista-portada" class="portada">
- <div class="p-nav">
-  <span class="marca-mini">MSLS<b>+</b></span>
-  <button type="button" id="b-nav-citas">Ver citas</button>
- </div>
- <section class="hero">
-  <div>
-   <p class="saludo">Bienvenido a MSLS+</p>
-   <h1>Cada cita, en su <em>hora</em>.</h1>
-   <p class="lead">Agende, cambie o cancele citas en tres clínicas sin cruces ni pérdidas, con pocos pasos y letra clara.</p>
-   <div class="acciones">
-    <button type="button" class="btn" id="b-agenda-ahora"><svg class="ic"><use href="#i-cal"/></svg>Agenda tu cita ahora</button>
-   </div>
+  <!-- ===== PORTADA ===== -->
+  <div id="vista-portada" class="portada">
+    <header class="p-nav">
+      <span class="marca-mini">MSLS<b>+</b></span>
+      <button type="button" id="b-nav-citas">Ver citas</button>
+    </header>
+
+    <section class="hero">
+      <div>
+        <p class="saludo">Bienvenido a MSLS+</p>
+        <h1>Cada cita, en su <em>hora</em>.</h1>
+        <p class="lead">Agende, cambie o cancele citas en tres clínicas sin cruces ni pérdidas, con pocos pasos y letra clara.</p>
+        <div class="acciones">
+          <button type="button" class="btn" id="b-agenda-ahora">
+            <svg class="ic"><use href="#i-cal"/></svg>Agenda tu cita ahora
+          </button>
+        </div>
+      </div>
+
+      <div class="maqueta" aria-hidden="true">
+        <div class="m-card">
+          <div class="m-cab"><b>Agenda de hoy</b><span class="m-ok">Sin cruces</span></div>
+          <div class="m-fila"><time>09:00</time><div>Consulta general<small>Clínica Centro</small></div><i class="punto"></i></div>
+          <div class="m-fila"><time>09:30</time><div>Control pediátrico<small>Clínica Norte</small></div><i class="punto n"></i></div>
+          <div class="m-fila"><time>10:15</time><div>Chequeo anual<small>Clínica Sur</small></div><i class="punto s"></i></div>
+        </div>
+        <div class="m-flota">
+          <svg class="ic"><use href="#i-back"/></svg>
+          <span>Cita cancelada · <u>Deshacer</u></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="sedes" aria-label="Nuestras clínicas">
+      <div class="sede"><i class="punto"></i><div><b>Clínica Centro</b><small>Consulta general</small></div></div>
+      <div class="sede"><i class="punto n"></i><div><b>Clínica Norte</b><small>Atención familiar</small></div></div>
+      <div class="sede"><i class="punto s"></i><div><b>Clínica Sur</b><small>Atención preventiva</small></div></div>
+    </section>
+
+    <section class="pilares">
+      <div class="pilar">
+        <h2>Visión</h2>
+        <p>Ser la principal clínica de salud, ofreciendo servicios de calidad y atención personalizada a nuestros pacientes.</p>
+      </div>
+      <div class="pilar">
+        <h2>A qué nos dedicamos</h2>
+        <p>Ofrecemos atención médica integral, consultas preventivas y acompañamiento cercano para cuidar la salud de nuestros pacientes.</p>
+      </div>
+    </section>
   </div>
-  <div class="maqueta" aria-hidden="true">
-   <div class="m-card">
-    <div class="m-cab"><b>Agenda de hoy</b><span class="m-ok">Sin cruces</span></div>
-    <div class="m-fila"><time>09:00</time><div>Consulta general<small>Clínica Centro</small></div><i class="punto"></i></div>
-    <div class="m-fila"><time>09:30</time><div>Control pediátrico<small>Clínica Norte</small></div><i class="punto n"></i></div>
-    <div class="m-fila"><time>10:15</time><div>Chequeo anual<small>Clínica Sur</small></div><i class="punto s"></i></div>
-   </div>
-   <div class="m-flota"><svg class="ic"><use href="#i-back"/></svg><span>Cita cancelada · <u>Deshacer</u></span></div>
+
+  <!-- ===== SISTEMA ===== -->
+  <div id="vista-sistema" class="app oculto">
+    <aside>
+      <div class="logo">Clin<b>Agenda</b></div>
+      <nav>
+        <button type="button" data-v="nueva" class="on"><svg class="ic"><use href="#i-plus"/></svg>Nueva cita</button>
+        <button type="button" data-v="citas"><svg class="ic"><use href="#i-cal"/></svg>Citas</button>
+        <button type="button" data-v="pacientes"><svg class="ic"><use href="#i-users"/></svg>Pacientes</button>
+        <button type="button" data-v="auditoria" id="nav-auditoria" class="oculto"><svg class="ic"><use href="#i-shield"/></svg>Historial de cambios</button>
+      </nav>
+      <button type="button" class="btn-volver" id="b-volver-portada">Volver al inicio</button>
+      <div class="usuario">
+        <span class="u-nombre" id="u-nombre"></span>
+        <span class="u-rol" id="u-rol"></span>
+        <button type="button" class="btn-volver" id="b-salir">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main>
+      <div id="pendientes" class="aviso-pend oculto" role="status"></div>
+
+      <!-- NUEVA CITA -->
+      <section id="v-nueva">
+        <div class="cab">
+          <div>
+            <h1>¿Para quién es la cita?</h1>
+            <p>Complete los datos. Si algo no está bien, le diremos qué corregir sin borrar lo que escribió.</p>
+          </div>
+          <span class="fecha-hoy" id="fecha-hoy"></span>
+        </div>
+
+        <div class="dos">
+          <div class="card">
+            <h3>Datos de la cita</h3>
+            <label for="buscar">Buscar paciente (escriba parte del nombre)</label>
+            <input id="buscar" placeholder="Ejemplo: maria" autocomplete="off" maxlength="60">
+
+            <label for="c-paciente">Paciente</label>
+            <select id="c-paciente"></select>
+
+            <div class="fila">
+              <div>
+                <label for="c-medico">Médico</label>
+                <select id="c-medico"></select>
+              </div>
+              <div>
+                <label for="c-clinica">Clínica</label>
+                <select id="c-clinica"></select>
+                <span class="ayuda" id="c-horario"></span>
+              </div>
+            </div>
+
+            <div class="fila">
+              <div>
+                <label for="c-fecha">Fecha</label>
+                <input type="date" id="c-fecha">
+              </div>
+              <div>
+                <label for="c-hora">Hora</label>
+                <input type="time" id="c-hora" step="900">
+              </div>
+            </div>
+
+            <label for="c-dur">Duración</label>
+            <select id="c-dur">
+              <option value="15">15 minutos</option>
+              <option value="30" selected>30 minutos</option>
+              <option value="45">45 minutos</option>
+              <option value="60">1 hora</option>
+            </select>
+
+            <div class="error" id="e-cita" role="alert"></div>
+            <button type="button" class="btn bloque" id="b-cita">Agendar cita</button>
+          </div>
+
+          <aside class="card resumen" aria-live="polite">
+            <h3>Resumen</h3>
+            <dl>
+              <dt>Paciente</dt><dd id="r-paciente"></dd>
+              <dt>Médico</dt><dd id="r-medico"></dd>
+              <dt>Clínica</dt><dd id="r-clinica"></dd>
+              <dt>Día y hora</dt><dd id="r-cuando"></dd>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <!-- CITAS -->
+      <section id="v-citas" class="oculto">
+        <div class="cab">
+          <div>
+            <h1>Citas</h1>
+            <p>Las citas canceladas no se borran: puede reactivarlas con “Deshacer”.</p>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><b id="s-activas">0</b><span>Citas activas</span></div>
+          <div class="stat"><b id="s-canceladas">0</b><span>Canceladas</span></div>
+          <div class="stat"><b id="s-hoy">0</b><span>Para hoy</span></div>
+        </div>
+        <label for="f-clinica">Mostrar</label>
+        <select id="f-clinica"><option value="">Todas las clínicas</option></select>
+        <div id="lista-citas"></div>
+      </section>
+
+      <!-- HISTORIAL (solo doctora) -->
+      <section id="v-auditoria" class="oculto">
+        <div class="cab">
+          <div>
+            <h1>Historial de cambios</h1>
+            <p>Quién hizo qué y cuándo. Esta lista no se puede borrar desde el sistema.</p>
+          </div>
+        </div>
+        <div id="lista-aud"></div>
+      </section>
+
+      <!-- PACIENTES -->
+      <section id="v-pacientes" class="oculto">
+        <div class="cab">
+          <div>
+            <h1>Pacientes</h1>
+            <p>Registre a un paciente nuevo. Nombre completo y fecha de nacimiento son obligatorios.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <label for="p-nombre" style="margin-top:0">Nombre completo *</label>
+          <input id="p-nombre" autocomplete="off" maxlength="100" placeholder="Nombre y apellido">
+
+          <div class="fila">
+            <div>
+              <label for="p-nac">Fecha de nacimiento *</label>
+              <input type="date" id="p-nac">
+            </div>
+            <div>
+              <label for="p-tipo">Documento</label>
+              <select id="p-tipo">
+                <option value="cedula">Cédula</option>
+                <option value="pasaporte">Pasaporte</option>
+                <option value="ninguno">Todavía no tiene</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="p-doc-box">
+            <label for="p-doc">Número de documento</label>
+            <input id="p-doc" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="10 números">
+            <span class="ayuda" id="p-doc-ayuda">La cédula tiene 10 números, sin espacios.</span>
+          </div>
+
+          <div class="fila">
+            <div>
+              <label for="p-tel">Teléfono (opcional)</label>
+              <input id="p-tel" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="0991234567">
+            </div>
+            <div>
+              <label for="p-cor">Correo (opcional)</label>
+              <input id="p-cor" type="email" inputmode="email" autocomplete="off" maxlength="120" placeholder="nombre@correo.com">
+            </div>
+          </div>
+
+          <label for="p-resp">Teléfono de un familiar o tutor (opcional)</label>
+          <input id="p-resp" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="0991234567">
+
+          <div class="error" id="e-pac" role="alert"></div>
+          <button type="button" class="btn bloque" id="b-pac">Guardar paciente</button>
+          <button type="button" class="btn sec bloque oculto" id="b-pac-igual" style="margin-top:10px">Es otra persona: crear igual</button>
+        </div>
+
+        <div id="lista-pac"></div>
+      </section>
+    </main>
   </div>
- </section>
- <section class="sedes" aria-label="Nuestras clínicas">
-  <div class="sede"><i class="punto"></i><div><b>Clínica Centro</b><small>Consulta general</small></div></div>
-  <div class="sede"><i class="punto n"></i><div><b>Clínica Norte</b><small>Atención familiar</small></div></div>
-  <div class="sede"><i class="punto s"></i><div><b>Clínica Sur</b><small>Atención preventiva</small></div></div>
- </section>
- <section class="pilares">
-  <div class="pilar"><h2>Visión</h2><p>Ser la principal clínica de salud, ofreciendo servicios de calidad y atención personalizada a nuestros pacientes.</p></div>
-  <div class="pilar"><h2>A qué nos dedicamos</h2><p>Ofrecemos atención médica integral, consultas preventivas y acompañamiento cercano para cuidar la salud de nuestros pacientes.</p></div>
- </section>
-</div>
 
-<!-- ===== SISTEMA ===== -->
-<div id="vista-sistema" class="app oculto">
- <aside>
-  <div class="logo">Clin<b>Agenda</b></div>
-  <nav>
-   <button data-v="nueva" class="on"><svg class="ic"><use href="#i-plus"/></svg>Nueva cita</button>
-   <button data-v="citas"><svg class="ic"><use href="#i-cal"/></svg>Citas</button>
-   <button data-v="pacientes"><svg class="ic"><use href="#i-users"/></svg>Pacientes</button>
-   <button data-v="auditoria" id="nav-auditoria" class="oculto"><svg class="ic"><use href="#i-shield"/></svg>Historial de cambios</button>
-  </nav>
-  <button type="button" class="btn-volver" id="b-volver-portada">Volver al inicio</button>
-  <div class="usuario">
-   <span class="u-nombre" id="u-nombre"></span><span class="u-rol" id="u-rol"></span>
-   <button type="button" class="btn-volver" id="b-salir">Cerrar sesión</button>
+  <!-- MODAL LOGIN -->
+  <div id="login" class="oculto" role="dialog" aria-modal="true" aria-labelledby="l-titulo">
+    <div class="card login-card">
+      <h2 id="l-titulo">Ingrese a MSLS+</h2>
+      <label for="l-usuario">¿Quién es usted?</label>
+      <select id="l-usuario"></select>
+      <label for="l-pin">PIN (solo números)</label>
+      <input id="l-pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12">
+      <div class="error" id="e-login" role="alert"></div>
+      <button type="button" class="btn bloque" id="b-login">Entrar</button>
+    </div>
   </div>
- </aside>
 
- <main>
-  <div id="pendientes" class="aviso-pend oculto" role="status"></div>
-  <!-- NUEVA CITA -->
-  <section id="v-nueva">
-   <div class="cab"><div><h1>¿Para quién es la cita?</h1>
-    <p>Complete los datos. Si algo no está bien, le diremos qué corregir sin borrar lo que escribió.</p></div>
-    <span class="fecha-hoy" id="fecha-hoy"></span></div>
-   <div class="dos">
-    <div class="card">
-     <h3>Datos de la cita</h3>
-     <label for="buscar">Buscar paciente (escriba parte del nombre)</label>
-     <input id="buscar" placeholder="Ejemplo: maria" autocomplete="off" maxlength="60">
-     <label for="c-paciente">Paciente</label><select id="c-paciente"></select>
-     <div class="fila">
-      <div><label for="c-medico">Médico</label><select id="c-medico"></select></div>
-      <div><label for="c-clinica">Clínica</label><select id="c-clinica"></select><span class="ayuda" id="c-horario"></span></div>
-     </div>
-     <div class="fila">
-      <div><label for="c-fecha">Fecha</label><input type="date" id="c-fecha"></div>
-      <div><label for="c-hora">Hora</label><input type="time" id="c-hora" step="900"></div>
-     </div>
-     <label for="c-dur">Duración</label>
-     <select id="c-dur"><option value="15">15 minutos</option><option value="30" selected>30 minutos</option>
-      <option value="45">45 minutos</option><option value="60">1 hora</option></select>
-     <div class="error" id="e-cita" role="alert"></div>
-     <button class="btn bloque" id="b-cita">Agendar cita</button>
-    </div>
-    <div class="card resumen" aria-live="polite">
-     <h3>Resumen</h3>
-     <dl>
-      <dt>Paciente</dt><dd id="r-paciente"></dd>
-      <dt>Médico</dt><dd id="r-medico"></dd>
-      <dt>Clínica</dt><dd id="r-clinica"></dd>
-      <dt>Día y hora</dt><dd id="r-cuando"></dd>
-     </dl>
-    </div>
-   </div>
-  </section>
+  <!-- TOAST -->
+  <div id="toast" class="oculto" role="status" aria-live="polite"></div>
 
-  <!-- CITAS -->
-  <section id="v-citas" class="oculto">
-   <div class="cab"><div><h1>Citas</h1><p>Las citas canceladas no se borran: puede reactivarlas con “Deshacer”.</p></div></div>
-   <div class="stats">
-    <div class="stat"><b id="s-activas">0</b><span>Citas activas</span></div>
-    <div class="stat"><b id="s-canceladas">0</b><span>Canceladas</span></div>
-    <div class="stat"><b id="s-hoy">0</b><span>Para hoy</span></div>
-   </div>
-   <label for="f-clinica">Mostrar</label>
-   <select id="f-clinica"><option value="">Todas las clínicas</option></select>
-   <div id="lista-citas"></div>
-  </section>
+  <script>
+    const $ = s => document.querySelector(s);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+    const sinTildes = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const hoyLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    const claseSede = n => /norte/i.test(n) ? 'norte' : /sur/i.test(n) ? 'sur' : '';
 
-  <!-- HISTORIAL (solo doctora) -->
-  <section id="v-auditoria" class="oculto">
-   <div class="cab"><div><h1>Historial de cambios</h1><p>Quién hizo qué y cuándo. Esta lista no se puede borrar desde el sistema.</p></div></div>
-   <div id="lista-aud"></div>
-  </section>
-  <!-- PACIENTES -->
-  <section id="v-pacientes" class="oculto">
-   <div class="cab"><div><h1>Pacientes</h1><p>Registre a un paciente nuevo. Nombre completo y fecha de nacimiento son obligatorios.</p></div></div>
-   <div class="card">
-    <label for="p-nombre" style="margin-top:0">Nombre completo *</label>
-    <input id="p-nombre" autocomplete="off" maxlength="100" placeholder="Nombre y apellido">
-    <div class="fila">
-     <div><label for="p-nac">Fecha de nacimiento *</label><input type="date" id="p-nac"></div>
-     <div><label for="p-tipo">Documento</label>
-      <select id="p-tipo"><option value="cedula">Cédula</option><option value="pasaporte">Pasaporte</option>
-       <option value="ninguno">Todavía no tiene</option></select></div>
-    </div>
-    <div id="p-doc-box"><label for="p-doc">Número de documento</label>
-     <input id="p-doc" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="10 números">
-     <span class="ayuda" id="p-doc-ayuda">La cédula tiene 10 números, sin espacios.</span></div>
-    <div class="fila">
-     <div><label for="p-tel">Teléfono (opcional)</label><input id="p-tel" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="0991234567"></div>
-     <div><label for="p-cor">Correo (opcional)</label><input id="p-cor" type="email" inputmode="email" autocomplete="off" maxlength="120" placeholder="nombre@correo.com"></div>
-    </div>
-    <label for="p-resp">Teléfono de un familiar o tutor (opcional)</label>
-    <input id="p-resp" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="0991234567">
-    <div class="error" id="e-pac" role="alert"></div>
-    <button class="btn bloque" id="b-pac">Guardar paciente</button>
-    <button class="btn sec bloque oculto" id="b-pac-igual" style="margin-top:10px">Es otra persona: crear igual</button>
-   </div>
-   <div id="lista-pac"></div>
-  </section>
- </main>
-</div>
-<div id="login" class="oculto" role="dialog" aria-modal="true" aria-labelledby="l-titulo">
- <div class="card login-card">
-  <h2 id="l-titulo">Ingrese a MSLS+</h2>
-  <label for="l-usuario">¿Quién es usted?</label><select id="l-usuario"></select>
-  <label for="l-pin">PIN (solo números)</label>
-  <input id="l-pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12">
-  <div class="error" id="e-login" role="alert"></div>
-  <button type="button" class="btn bloque" id="b-login">Entrar</button>
- </div>
-</div>
-<div id="toast" class="oculto" role="status" aria-live="polite"></div>
+    let datos = { clinicas: [], medicos: [], pacientes: [], citas: [], horarios: [] };
+    let sesion = null;
 
-<script>
-const $ = s => document.querySelector(s);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const sinTildes = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-const hoyLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-const claseSede = n => /norte/i.test(n) ? 'norte' : /sur/i.test(n) ? 'sur' : '';
-let datos = {clinicas: [], medicos: [], pacientes: [], citas: []};
-$('#fecha-hoy').textContent = new Date().toLocaleDateString('es-EC', {weekday: 'long', day: 'numeric', month: 'long'});
+    $('#fecha-hoy').textContent = new Date().toLocaleDateString('es-EC', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    });
 
-/* ---------- portada <-> sistema ---------- */
-function mostrarVista(v) {
-  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.v === v));
-  ['nueva', 'citas', 'pacientes', 'auditoria'].forEach(k => $('#v-' + k).classList.toggle('oculto', k !== v));
-}
-function abrirSistema(vista = 'nueva') {
-  $('#vista-portada').classList.add('oculto'); $('#vista-sistema').classList.remove('oculto');
-  mostrarVista(vista); window.scrollTo({top: 0}); cargar();
-}
-function volverPortada() {
-  $('#vista-sistema').classList.add('oculto'); $('#vista-portada').classList.remove('oculto'); window.scrollTo({top: 0});
-}
-$('#b-agenda-ahora').onclick = () => abrirSistema('nueva');
-$('#b-nav-citas').onclick = () => abrirSistema('citas');
-$('#b-volver-portada').onclick = volverPortada;
-
-let sesion = null;
-async function api(ruta, cuerpo) {
-  let r, j;
-  try {
-    r = await fetch(ruta, cuerpo === undefined ? {} : {method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(cuerpo)});
-    j = await r.json();
-  } catch (e) {
-    throw {offline: true, mensaje: 'No hay conexión con el sistema. Lo que escribió sigue en pantalla: intente de nuevo en un momento.'};
-  }
-  if (!r.ok) {
-    if (r.status === 401 && j.codigo === 'sin_sesion') pedirLogin();
-    throw {mensaje: j.error || 'Algo salió mal. Intente de nuevo.', codigo: j.codigo, campo: j.campo, estado: r.status};
-  }
-  return j;
-}
-
-let tt;
-function aviso(texto, accion) {
-  const t = $('#toast'); t.innerHTML = `<span>${esc(texto)}</span>`;
-  if (accion) { const b = document.createElement('button'); b.textContent = accion.texto; b.onclick = () => { t.classList.add('oculto'); accion.fn(); }; t.append(b); }
-  t.classList.remove('oculto'); clearTimeout(tt); tt = setTimeout(() => t.classList.add('oculto'), accion ? 12000 : 4000);
-}
-
-/* ---------- marcar el casillero con error ---------- */
-const CAMPOS = {nombre: '#p-nombre', fecha_nacimiento: '#p-nac', documento: '#p-doc', telefono: '#p-tel',
-  correo: '#p-cor', contacto_responsable: '#p-resp', fecha: '#c-fecha', hora: '#c-hora', pin: '#l-pin'};
-const limpiarMarcas = c => document.querySelectorAll(c + ' [aria-invalid]').forEach(el => el.removeAttribute('aria-invalid'));
-function marcarCampo(campo) {
-  const el = CAMPOS[campo] && $(CAMPOS[campo]);
-  if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); }
-}
-
-document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
-  mostrarVista(b.dataset.v); cargar(); if (b.dataset.v === 'auditoria') pintarAuditoria(); });
-
-/* ---------- datos ---------- */
-async function cargar() {
-  try { datos = await api('/api/datos'); } catch (e) { return e.estado === 401 ? null : aviso(e.mensaje); }
-  sesion = datos.sesion; aplicarSesion();
-  pintarSelects(); pintarCitas(); pintarPacientes(); resumen();
-}
-function pintarSelects() {
-  const sel = (id, items, ph) => { const el = $(id), v = el.value;
-    el.innerHTML = `<option value="">${ph}</option>` + items.map(i => `<option value="${i.id}">${esc(i.nombre)}</option>`).join('');
-    if ([...el.options].some(o => o.value === v)) el.value = v; };
-  filtrarPacientes();
-  sel('#c-medico', datos.medicos, 'Elija un médico'); sel('#c-clinica', datos.clinicas, 'Elija una clínica');
-  const f = $('#f-clinica'), v = f.value;
-  f.innerHTML = '<option value="">Todas las clínicas</option>' + datos.clinicas.map(c => `<option>${esc(c.nombre)}</option>`).join('');
-  f.value = v;
-  $('#c-fecha').min = hoyLocal(); $('#p-nac').max = hoyLocal();
-  $('#p-nac').min = String(new Date().getFullYear() - 120) + '-01-01';
-}
-function filtrarPacientes() {
-  const q = sinTildes($('#buscar').value.trim()), el = $('#c-paciente'), v = el.value;
-  const lista = datos.pacientes.filter(p => sinTildes(p.nombre).includes(q));
-  el.innerHTML = '<option value="">Elija un paciente</option>' + lista.map(p =>
-    `<option value="${p.id}">${esc(p.nombre)} · ${esc(p.fecha_nacimiento)}</option>`).join('');
-  if (lista.some(p => String(p.id) === v)) el.value = v; else if (lista.length === 1) el.value = lista[0].id;
-  resumen();
-}
-$('#buscar').oninput = filtrarPacientes;
-
-/* ---------- resumen en vivo de la cita ---------- */
-function resumen() {
-  const txt = id => { const o = $(id).selectedOptions[0]; return o && o.value ? o.textContent : ''; };
-  const poner = (id, v) => { const e = $(id); e.textContent = v || 'Sin elegir'; e.classList.toggle('vacio-r', !v); };
-  poner('#r-paciente', txt('#c-paciente')); poner('#r-medico', txt('#c-medico')); poner('#r-clinica', txt('#c-clinica'));
-  $('#c-horario').textContent = textoHorario($('#c-clinica').value);
-  const f = $('#c-fecha').value, h = $('#c-hora').value;
-  poner('#r-cuando', f && h ? new Date(f + 'T' + h).toLocaleString('es-EC', {weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'}) : '');
-}
-['#c-paciente', '#c-medico', '#c-clinica', '#c-fecha', '#c-hora'].forEach(s => $(s).addEventListener('input', resumen));
-
-/* ---------- agendar ---------- */
-const textoSel = id => { const o = $(id).selectedOptions[0]; return o && o.value ? o.textContent : ''; };
-$('#b-cita').onclick = async () => {
-  const b = $('#b-cita'), e = $('#e-cita'); e.textContent = ''; limpiarMarcas('#v-nueva'); b.disabled = true;
-  // 'clave' identifica este intento: si hay que reenviarlo por falta de internet, el servidor no duplica la cita.
-  const cuerpo = {paciente_id: $('#c-paciente').value, medico_id: $('#c-medico').value, clinica_id: $('#c-clinica').value,
-    fecha: $('#c-fecha').value, hora: $('#c-hora').value, duracion: $('#c-dur').value, clave: nuevaClave()};
-  try {
-    await api('/api/citas', cuerpo);
-    aviso('✔ Cita agendada'); $('#c-hora').value = ''; await cargar();
-  } catch (x) {
-    if (x.offline && cuerpo.paciente_id && cuerpo.medico_id && cuerpo.clinica_id && cuerpo.fecha && cuerpo.hora) {
-      const l = leerPend();
-      l.push({clave: cuerpo.clave, cuerpo, texto: `${textoSel('#c-paciente')} · ${cuerpo.fecha} ${cuerpo.hora} · ${textoSel('#c-clinica')}`});
-      if (guardarPend(l)) { aviso('Sin internet: la cita quedó guardada en este equipo, pero NO está confirmada todavía.');
-        $('#c-hora').value = ''; pintarPend(); }
-      else e.textContent = x.mensaje + ' Además no se pudo guardar en este equipo: anote la cita en papel.';
-    } else { e.textContent = x.mensaje; marcarCampo(x.campo); }
-  }
-  b.disabled = false;
-};
-
-/* ---------- lista de citas ---------- */
-function pintarCitas() {
-  const filtro = $('#f-clinica').value, cont = $('#lista-citas');
-  const citas = datos.citas.filter(c => !filtro || c.clinica === filtro);
-  $('#s-activas').textContent = citas.filter(c => c.estado === 'activa').length;
-  $('#s-canceladas').textContent = citas.filter(c => c.estado === 'cancelada').length;
-  $('#s-hoy').textContent = citas.filter(c => c.estado === 'activa' && c.inicio.slice(0, 10) === hoyLocal()).length;
-  if (!citas.length) { cont.innerHTML = '<div class="vacio">No hay citas próximas.</div>'; return; }
-  let dia = '', html = '';
-  for (const c of citas) {
-    const d = new Date(c.inicio), clave = c.inicio.slice(0, 10);
-    if (clave !== dia) { dia = clave; html += `<div class="dia">${esc(d.toLocaleDateString('es-EC', {weekday: 'long', day: 'numeric', month: 'long'}))}</div>`; }
-    const hora = c.inicio.slice(11, 16), cancel = c.estado === 'cancelada';
-    html += `<div class="card cita ${claseSede(c.clinica)} ${cancel ? 'cancelada' : ''}"><div class="hora">${hora}</div>
-      <div class="info"><b>${esc(c.paciente)}</b>${cancel ? '<span class="chip">Cancelada</span>' : ''}
-      <small>${esc(c.medico)} · ${esc(c.clinica)}</small></div>
-      ${cancel ? `<button class="chico ok" data-a="deshacer" data-id="${c.id}">Deshacer</button>`
-               : `<button class="chico peligro" data-a="cancelar" data-id="${c.id}">Cancelar cita</button>`}</div>`;
-  }
-  cont.innerHTML = html;
-}
-$('#f-clinica').onchange = pintarCitas;
-$('#lista-citas').onclick = async ev => {
-  const b = ev.target.closest('button[data-a]'); if (!b) return;
-  const id = b.dataset.id, accion = b.dataset.a;
-  if (accion === 'cancelar' && !confirm('¿Seguro que desea cancelar esta cita?\n(Podrá deshacerlo después.)')) return;
-  try {
-    const r = await api(`/api/citas/${id}/${accion}`, {});
-    aviso(r.mensaje, accion === 'cancelar' ? {texto: 'Deshacer', fn: () => accionCita(id, 'deshacer')} : null);
-  } catch (x) { aviso(x.mensaje); }
-  cargar();
-};
-async function accionCita(id, accion) {
-  try { aviso((await api(`/api/citas/${id}/${accion}`, {})).mensaje); } catch (x) { aviso(x.mensaje); }
-  cargar();
-}
-
-/* ---------- pacientes ---------- */
-function ajustarDocumento() {
-  const tipo = $('#p-tipo').value, doc = $('#p-doc'), ayuda = $('#p-doc-ayuda');
-  $('#p-doc-box').classList.toggle('oculto', tipo === 'ninguno'); doc.removeAttribute('aria-invalid');
-  if (tipo === 'cedula') {
-    doc.inputMode = 'numeric'; doc.maxLength = 10; doc.placeholder = '10 números';
-    ayuda.textContent = 'La cédula tiene 10 números, sin espacios.'; doc.value = doc.value.replace(/\D/g, '').slice(0, 10);
-  } else if (tipo === 'pasaporte') {
-    doc.inputMode = 'text'; doc.maxLength = 15; doc.placeholder = 'Letras y números';
-    ayuda.textContent = 'El pasaporte tiene entre 5 y 15 letras o números, sin espacios.'; doc.value = doc.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 15);
-  }
-}
-$('#p-tipo').onchange = ajustarDocumento;
-$('#p-doc').oninput = () => { const d = $('#p-doc');
-  d.value = $('#p-tipo').value === 'cedula' ? d.value.replace(/\D/g, '') : d.value.replace(/[^A-Za-z0-9]/g, ''); };
-
-async function guardarPaciente(confirmar) {
-  const e = $('#e-pac'); e.textContent = ''; limpiarMarcas('#v-pacientes'); $('#b-pac-igual').classList.add('oculto');
-  if (!$('#p-nombre').value.trim()) { e.textContent = 'Escriba el nombre completo del paciente.'; return marcarCampo('nombre'); }
-  if (!$('#p-nac').value) { e.textContent = 'Elija la fecha de nacimiento.'; return marcarCampo('fecha_nacimiento'); }
-  $('#b-pac').disabled = true;
-  try {
-    await api('/api/pacientes', {nombre: $('#p-nombre').value, fecha_nacimiento: $('#p-nac').value, tipo_doc: $('#p-tipo').value,
-      documento: $('#p-doc').value, telefono: $('#p-tel').value, correo: $('#p-cor').value,
-      contacto_responsable: $('#p-resp').value, confirmar_homonimo: confirmar});
-    ['nombre', 'nac', 'doc', 'tel', 'cor', 'resp'].forEach(k => $('#p-' + k).value = '');
-    aviso('✔ Paciente registrado'); await cargar();
-  } catch (x) {
-    e.textContent = x.mensaje; marcarCampo(x.campo);
-    if (x.codigo === 'homonimo') $('#b-pac-igual').classList.remove('oculto');
-  }
-  $('#b-pac').disabled = false;
-}
-$('#b-pac').onclick = () => guardarPaciente(false);
-$('#b-pac-igual').onclick = () => guardarPaciente(true);
-function pintarPacientes() {
-  const ini = n => n.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
-  $('#lista-pac').innerHTML = '<div class="dia">Pacientes registrados</div>' + (datos.pacientes.map(p =>
-    `<div class="card pac"><span class="avatar" aria-hidden="true">${esc(ini(p.nombre))}</span><div><b>${esc(p.nombre)}</b>
-     <small>Nació el ${esc(p.fecha_nacimiento)} · ${p.tipo_doc === 'ninguno' ? 'sin documento' : esc(p.tipo_doc) + ' ' + esc(p.documento)}${p.telefono ? ' · Tel. ' + esc(p.telefono) : ''}${p.correo ? ' · ' + esc(p.correo) : ''}</small></div></div>`).join('')
-    || '<div class="vacio">Aún no hay pacientes.</div>');
-}
-/* ---------- horario de cada clínica ---------- */
-const DIA_CORTO = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-function textoHorario(id) {
-  const h = (datos.horarios || []).filter(x => String(x.clinica_id) === String(id));
-  if (!h.length) return '';
-  const g = [];
-  for (const x of h) {
-    const k = x.abre + '–' + x.cierra, u = g[g.length - 1];
-    if (u && u.k === k && u.fin === x.dia_semana - 1) u.fin = x.dia_semana; else g.push({k, ini: x.dia_semana, fin: x.dia_semana});
-  }
-  return 'Atiende: ' + g.map(x => (x.ini === x.fin ? DIA_CORTO[x.ini] : DIA_CORTO[x.ini] + ' a ' + DIA_CORTO[x.fin]) + ' ' + x.k).join(' · ');
-}
-/* ---------- ingreso con PIN ---------- */
-async function pedirLogin() {
-  sesion = null; aplicarSesion();
-  try {
-    const u = await api('/api/usuarios');
-    $('#l-usuario').innerHTML = u.usuarios.map(n => `<option>${esc(n)}</option>`).join('');
-  } catch (e) { $('#e-login').textContent = e.mensaje; }
-  $('#l-pin').value = ''; $('#login').classList.remove('oculto'); $('#l-pin').focus();
-}
-async function entrar() {
-  const b = $('#b-login'); b.disabled = true; $('#e-login').textContent = ''; limpiarMarcas('#login');
-  try {
-    await api('/api/login', {nombre: $('#l-usuario').value, pin: $('#l-pin').value});
-    $('#login').classList.add('oculto'); $('#l-pin').value = '';
-    await cargar(); reenviarPendientes();
-  } catch (x) { $('#e-login').textContent = x.mensaje; marcarCampo(x.campo); $('#l-pin').select(); }
-  b.disabled = false;
-}
-$('#b-login').onclick = entrar;
-$('#l-pin').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
-function aplicarSesion() {
-  $('#u-nombre').textContent = sesion ? sesion.nombre : '';
-  $('#u-rol').textContent = sesion ? (sesion.rol === 'doctora' ? 'Acceso completo' : 'Recepción') : '';
-  $('#nav-auditoria').classList.toggle('oculto', !(sesion && sesion.rol === 'doctora'));
-  if (!sesion || sesion.rol !== 'doctora') $('#v-auditoria').classList.add('oculto');
-}
-$('#b-salir').onclick = async () => {
-  try { await api('/api/logout', {}); } catch (e) {}
-  mostrarVista('nueva'); pedirLogin();
-};
-/* ---------- historial de cambios (solo doctora) ---------- */
-const ACCIONES = {crear: 'Registró un paciente', agendar: 'Agendó una cita', cancelar: 'Canceló una cita',
-  reactivar: 'Reactivó una cita', ingresar: 'Ingresó al sistema', ingreso_fallido: 'Intento de ingreso con PIN incorrecto'};
-async function pintarAuditoria() {
-  const cont = $('#lista-aud');
-  try {
-    const r = await api('/api/auditoria');
-    cont.innerHTML = r.eventos.map(e => `<div class="card evento ${e.accion === 'ingreso_fallido' ? 'malo' : ''}">
-      <time>${esc(new Date(e.cuando).toLocaleString('es-EC', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}))}</time>
-      <div><b>${esc(e.usuario)}</b> · ${esc(ACCIONES[e.accion] || e.accion)}</div>
-      ${e.entidad === 'cita' || e.entidad === 'paciente' ? `<small>${esc(e.entidad)} n.º ${esc(e.entidad_id)}${e.detalle ? ' · ' + esc(e.detalle) : ''}</small>` : ''}</div>`).join('')
-      || '<div class="vacio">Todavía no hay movimientos.</div>';
-  } catch (x) { cont.innerHTML = `<div class="vacio">${esc(x.mensaje)}</div>`; }
-}
-/* ---------- citas pendientes cuando se cae el internet (Clínica Sur) ---------- */
-const LLAVE_PEND = 'msls_pendientes';
-const leerPend = () => { try { return JSON.parse(localStorage.getItem(LLAVE_PEND) || '[]'); } catch (e) { return []; } };
-const guardarPend = l => { try { localStorage.setItem(LLAVE_PEND, JSON.stringify(l)); return true; } catch (e) { return false; } };
-const nuevaClave = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
-  : Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
-function pintarPend() {
-  const l = leerPend(), box = $('#pendientes');
-  box.classList.toggle('oculto', !l.length);
-  box.innerHTML = !l.length ? '' : `<b>⏳ ${l.length} cita(s) guardada(s) en este equipo, SIN confirmar todavía</b>
-    <small>Se enviarán solas cuando vuelva el internet. Hasta entonces la hora NO está reservada.</small>`
-    + l.map(p => `<div class="pend-fila"><span>${esc(p.texto)}${p.error ? `<br><em>No se pudo confirmar: ${esc(p.error)}</em>` : ''}</span>
-      <button type="button" class="chico" data-clave="${esc(p.clave)}">Descartar</button></div>`).join('')
-    + '<button type="button" class="chico" id="b-reintentar" style="margin-top:10px">Reintentar ahora</button>';
-}
-$('#pendientes').onclick = ev => {
-  if (ev.target.id === 'b-reintentar') return reenviarPendientes();
-  const c = ev.target.dataset && ev.target.dataset.clave;
-  if (c) { guardarPend(leerPend().filter(p => p.clave !== c)); pintarPend(); }
-};
-let enviando = false;
-async function reenviarPendientes() {
-  if (enviando || !sesion) return;
-  enviando = true; let enviado = false, l = leerPend();
-  for (const p of l) {
-    if (p.error) continue;
-    try {
-      await api('/api/citas', p.cuerpo);
-      l = l.filter(x => x.clave !== p.clave); guardarPend(l); enviado = true;
-      aviso('✔ Se confirmó la cita pendiente: ' + p.texto);
-    } catch (x) {
-      if (x.offline || x.estado === 401) break;
-      p.error = x.mensaje; guardarPend(l);   // el servidor la rechazó (ej. la hora ya fue tomada): que una persona decida
+    /* ---------- portada <-> sistema ---------- */
+    function mostrarVista(v) {
+      document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.v === v));
+      ['nueva', 'citas', 'pacientes', 'auditoria'].forEach(k => {
+        $('#v-' + k).classList.toggle('oculto', k !== v);
+      });
     }
-  }
-  enviando = false; pintarPend(); if (enviado) cargar();
-}
-window.addEventListener('online', reenviarPendientes);
-setInterval(() => { if (leerPend().some(p => !p.error)) reenviarPendientes(); }, 30000);
-pintarPend();
-</script>
+    function abrirSistema(vista = 'nueva') {
+      $('#vista-portada').classList.add('oculto');
+      $('#vista-sistema').classList.remove('oculto');
+      mostrarVista(vista);
+      window.scrollTo({ top: 0 });
+      cargar();
+    }
+    function volverPortada() {
+      $('#vista-sistema').classList.add('oculto');
+      $('#vista-portada').classList.remove('oculto');
+      window.scrollTo({ top: 0 });
+    }
+    $('#b-agenda-ahora').onclick = () => abrirSistema('nueva');
+    $('#b-nav-citas').onclick = () => abrirSistema('citas');
+    $('#b-volver-portada').onclick = volverPortada;
+
+    /* ---------- red / api ---------- */
+    async function api(ruta, cuerpo) {
+      let r, j;
+      try {
+        r = await fetch(ruta, cuerpo === undefined
+          ? {}
+          : {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(cuerpo)
+            });
+        j = await r.json();
+      } catch (e) {
+        throw {
+          offline: true,
+          mensaje: 'No hay conexión con el sistema. Lo que escribió sigue en pantalla: intente de nuevo en un momento.'
+        };
+      }
+      if (!r.ok) {
+        if (r.status === 401 && j.codigo === 'sin_sesion') pedirLogin();
+        throw {
+          mensaje: j.error || 'Algo salió mal. Intente de nuevo.',
+          codigo: j.codigo,
+          campo: j.campo,
+          estado: r.status
+        };
+      }
+      return j;
+    }
+
+    let tt;
+    function aviso(texto, accion) {
+      const t = $('#toast');
+      t.innerHTML = `<span>${esc(texto)}</span>`;
+      if (accion) {
+        const b = document.createElement('button');
+        b.textContent = accion.texto;
+        b.onclick = () => { t.classList.add('oculto'); accion.fn(); };
+        t.append(b);
+      }
+      t.classList.remove('oculto');
+      clearTimeout(tt);
+      tt = setTimeout(() => t.classList.add('oculto'), accion ? 12000 : 4000);
+    }
+
+    /* ---------- marcar el casillero con error ---------- */
+    const CAMPOS = {
+      nombre: '#p-nombre',
+      fecha_nacimiento: '#p-nac',
+      documento: '#p-doc',
+      telefono: '#p-tel',
+      correo: '#p-cor',
+      contacto_responsable: '#p-resp',
+      fecha: '#c-fecha',
+      hora: '#c-hora',
+      pin: '#l-pin'
+    };
+    const limpiarMarcas = c => document.querySelectorAll(c + ' [aria-invalid]').forEach(el => el.removeAttribute('aria-invalid'));
+    function marcarCampo(campo) {
+      const el = CAMPOS[campo] && $(CAMPOS[campo]);
+      if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); }
+    }
+
+    document.querySelectorAll('nav button').forEach(b => {
+      b.onclick = () => {
+        mostrarVista(b.dataset.v);
+        cargar();
+        if (b.dataset.v === 'auditoria') pintarAuditoria();
+      };
+    });
+
+    /* ---------- datos ---------- */
+    async function cargar() {
+      try {
+        datos = await api('/api/datos');
+      } catch (e) {
+        return e.estado === 401 ? null : aviso(e.mensaje);
+      }
+      sesion = datos.sesion;
+      aplicarSesion();
+      pintarSelects();
+      pintarCitas();
+      pintarPacientes();
+      resumen();
+    }
+
+    function pintarSelects() {
+      const sel = (id, items, ph) => {
+        const el = $(id), v = el.value;
+        el.innerHTML = `<option value="">${ph}</option>` + items.map(i => `<option value="${i.id}">${esc(i.nombre)}</option>`).join('');
+        if ([...el.options].some(o => o.value === v)) el.value = v;
+      };
+      filtrarPacientes();
+      sel('#c-medico', datos.medicos, 'Elija un médico');
+      sel('#c-clinica', datos.clinicas, 'Elija una clínica');
+
+      const f = $('#f-clinica'), v = f.value;
+      f.innerHTML = '<option value="">Todas las clínicas</option>' + datos.clinicas.map(c => `<option>${esc(c.nombre)}</option>`).join('');
+      f.value = v;
+
+      $('#c-fecha').min = hoyLocal();
+      $('#p-nac').max = hoyLocal();
+      $('#p-nac').min = String(new Date().getFullYear() - 120) + '-01-01';
+    }
+
+    function filtrarPacientes() {
+      const q = sinTildes($('#buscar').value.trim()), el = $('#c-paciente'), v = el.value;
+      const lista = datos.pacientes.filter(p => sinTildes(p.nombre).includes(q));
+      el.innerHTML = '<option value="">Elija un paciente</option>' + lista.map(p =>
+        `<option value="${p.id}">${esc(p.nombre)} · ${esc(p.fecha_nacimiento)}</option>`
+      ).join('');
+      if (lista.some(p => String(p.id) === v)) el.value = v;
+      else if (lista.length === 1) el.value = lista[0].id;
+      resumen();
+    }
+    $('#buscar').oninput = filtrarPacientes;
+
+    /* ---------- resumen en vivo de la cita ---------- */
+    function resumen() {
+      const txt = id => { const o = $(id).selectedOptions[0]; return o && o.value ? o.textContent : ''; };
+      const poner = (id, v) => { const e = $(id); e.textContent = v || 'Sin elegir'; e.classList.toggle('vacio-r', !v); };
+      poner('#r-paciente', txt('#c-paciente'));
+      poner('#r-medico', txt('#c-medico'));
+      poner('#r-clinica', txt('#c-clinica'));
+      $('#c-horario').textContent = textoHorario($('#c-clinica').value);
+      const f = $('#c-fecha').value, h = $('#c-hora').value;
+      poner('#r-cuando', f && h
+        ? new Date(f + 'T' + h).toLocaleString('es-EC', {
+            weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
+          })
+        : '');
+    }
+    ['#c-paciente', '#c-medico', '#c-clinica', '#c-fecha', '#c-hora'].forEach(s => $(s).addEventListener('input', resumen));
+
+    /* ---------- agendar ---------- */
+    const textoSel = id => { const o = $(id).selectedOptions[0]; return o && o.value ? o.textContent : ''; };
+    $('#b-cita').onclick = async () => {
+      const b = $('#b-cita'), e = $('#e-cita');
+      e.textContent = '';
+      limpiarMarcas('#v-nueva');
+      b.disabled = true;
+
+      // 'clave' identifica este intento: si hay que reenviarlo por falta de internet, el servidor no duplica la cita.
+      const cuerpo = {
+        paciente_id: $('#c-paciente').value,
+        medico_id: $('#c-medico').value,
+        clinica_id: $('#c-clinica').value,
+        fecha: $('#c-fecha').value,
+        hora: $('#c-hora').value,
+        duracion: $('#c-dur').value,
+        clave: nuevaClave()
+      };
+
+      try {
+        await api('/api/citas', cuerpo);
+        aviso('✔ Cita agendada');
+        $('#c-hora').value = '';
+        await cargar();
+      } catch (x) {
+        if (x.offline && cuerpo.paciente_id && cuerpo.medico_id && cuerpo.clinica_id && cuerpo.fecha && cuerpo.hora) {
+          const l = leerPend();
+          l.push({
+            clave: cuerpo.clave,
+            cuerpo,
+            texto: `${textoSel('#c-paciente')} · ${cuerpo.fecha} ${cuerpo.hora} · ${textoSel('#c-clinica')}`
+          });
+          if (guardarPend(l)) {
+            aviso('Sin internet: la cita quedó guardada en este equipo, pero NO está confirmada todavía.');
+            $('#c-hora').value = '';
+            pintarPend();
+          } else {
+            e.textContent = x.mensaje + ' Además no se pudo guardar en este equipo: anote la cita en papel.';
+          }
+        } else {
+          e.textContent = x.mensaje;
+          marcarCampo(x.campo);
+        }
+      }
+      b.disabled = false;
+    };
+
+    /* ---------- lista de citas ---------- */
+    function pintarCitas() {
+      const filtro = $('#f-clinica').value, cont = $('#lista-citas');
+      const citas = datos.citas.filter(c => !filtro || c.clinica === filtro);
+      $('#s-activas').textContent = citas.filter(c => c.estado === 'activa').length;
+      $('#s-canceladas').textContent = citas.filter(c => c.estado === 'cancelada').length;
+      $('#s-hoy').textContent = citas.filter(c => c.estado === 'activa' && c.inicio.slice(0, 10) === hoyLocal()).length;
+
+      if (!citas.length) {
+        cont.innerHTML = '<div class="vacio">No hay citas próximas.</div>';
+        return;
+      }
+
+      let dia = '', html = '';
+      for (const c of citas) {
+        const d = new Date(c.inicio), clave = c.inicio.slice(0, 10);
+        if (clave !== dia) {
+          dia = clave;
+          html += `<div class="dia">${esc(d.toLocaleDateString('es-EC', { weekday: 'long', day: 'numeric', month: 'long' }))}</div>`;
+        }
+        const hora = c.inicio.slice(11, 16), cancel = c.estado === 'cancelada';
+        html += `
+          <div class="card cita ${claseSede(c.clinica)} ${cancel ? 'cancelada' : ''}">
+            <div class="hora">${hora}</div>
+            <div class="info">
+              <b>${esc(c.paciente)}</b>${cancel ? '<span class="chip">Cancelada</span>' : ''}
+              <small>${esc(c.medico)} · ${esc(c.clinica)}</small>
+            </div>
+            ${cancel
+              ? `<button type="button" class="chico ok" data-a="deshacer" data-id="${c.id}">Deshacer</button>`
+              : `<button type="button" class="chico peligro" data-a="cancelar" data-id="${c.id}">Cancelar cita</button>`}
+          </div>`;
+      }
+      cont.innerHTML = html;
+    }
+
+    $('#f-clinica').onchange = pintarCitas;
+    $('#lista-citas').onclick = async ev => {
+      const b = ev.target.closest('button[data-a]');
+      if (!b) return;
+      const id = b.dataset.id, accion = b.dataset.a;
+      if (accion === 'cancelar' && !confirm('¿Seguro que desea cancelar esta cita?\n(Podrá deshacerlo después.)')) return;
+      try {
+        const r = await api(`/api/citas/${id}/${accion}`, {});
+        aviso(r.mensaje, accion === 'cancelar' ? { texto: 'Deshacer', fn: () => accionCita(id, 'deshacer') } : null);
+      } catch (x) {
+        aviso(x.mensaje);
+      }
+      cargar();
+    };
+
+    async function accionCita(id, accion) {
+      try {
+        aviso((await api(`/api/citas/${id}/${accion}`, {})).mensaje);
+      } catch (x) {
+        aviso(x.mensaje);
+      }
+      cargar();
+    }
+
+    /* ---------- pacientes ---------- */
+    function ajustarDocumento() {
+      const tipo = $('#p-tipo').value, doc = $('#p-doc'), ayuda = $('#p-doc-ayuda');
+      $('#p-doc-box').classList.toggle('oculto', tipo === 'ninguno');
+      doc.removeAttribute('aria-invalid');
+      if (tipo === 'cedula') {
+        doc.inputMode = 'numeric';
+        doc.maxLength = 10;
+        doc.placeholder = '10 números';
+        ayuda.textContent = 'La cédula tiene 10 números, sin espacios.';
+        doc.value = doc.value.replace(/\D/g, '').slice(0, 10);
+      } else if (tipo === 'pasaporte') {
+        doc.inputMode = 'text';
+        doc.maxLength = 15;
+        doc.placeholder = 'Letras y números';
+        ayuda.textContent = 'El pasaporte tiene entre 5 y 15 letras o números, sin espacios.';
+        doc.value = doc.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 15);
+      }
+    }
+    $('#p-tipo').onchange = ajustarDocumento;
+    $('#p-doc').oninput = () => {
+      const d = $('#p-doc');
+      d.value = $('#p-tipo').value === 'cedula'
+        ? d.value.replace(/\D/g, '')
+        : d.value.replace(/[^A-Za-z0-9]/g, '');
+    };
+
+    async function guardarPaciente(confirmar) {
+      const e = $('#e-pac');
+      e.textContent = '';
+      limpiarMarcas('#v-pacientes');
+      $('#b-pac-igual').classList.add('oculto');
+
+      if (!$('#p-nombre').value.trim()) {
+        e.textContent = 'Escriba el nombre completo del paciente.';
+        return marcarCampo('nombre');
+      }
+      if (!$('#p-nac').value) {
+        e.textContent = 'Elija la fecha de nacimiento.';
+        return marcarCampo('fecha_nacimiento');
+      }
+
+      $('#b-pac').disabled = true;
+      try {
+        await api('/api/pacientes', {
+          nombre: $('#p-nombre').value,
+          fecha_nacimiento: $('#p-nac').value,
+          tipo_doc: $('#p-tipo').value,
+          documento: $('#p-doc').value,
+          telefono: $('#p-tel').value,
+          correo: $('#p-cor').value,
+          contacto_responsable: $('#p-resp').value,
+          confirmar_homonimo: confirmar
+        });
+        ['nombre', 'nac', 'doc', 'tel', 'cor', 'resp'].forEach(k => { $('#p-' + k).value = ''; });
+        aviso('✔ Paciente registrado');
+        await cargar();
+      } catch (x) {
+        e.textContent = x.mensaje;
+        marcarCampo(x.campo);
+        if (x.codigo === 'homonimo') $('#b-pac-igual').classList.remove('oculto');
+      }
+      $('#b-pac').disabled = false;
+    }
+
+    $('#b-pac').onclick = () => guardarPaciente(false);
+    $('#b-pac-igual').onclick = () => guardarPaciente(true);
+
+    function pintarPacientes() {
+      const ini = n => n.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+      $('#lista-pac').innerHTML = '<div class="dia">Pacientes registrados</div>' + (datos.pacientes.map(p => `
+        <div class="card pac">
+          <span class="avatar" aria-hidden="true">${esc(ini(p.nombre))}</span>
+          <div>
+            <b>${esc(p.nombre)}</b>
+            <small>
+              Nació el ${esc(p.fecha_nacimiento)} ·
+              ${p.tipo_doc === 'ninguno' ? 'sin documento' : esc(p.tipo_doc) + ' ' + esc(p.documento)}
+              ${p.telefono ? ' · Tel. ' + esc(p.telefono) : ''}
+              ${p.correo ? ' · ' + esc(p.correo) : ''}
+            </small>
+          </div>
+        </div>
+      `).join('') || '<div class="vacio">Aún no hay pacientes.</div>');
+    }
+
+    /* ---------- horario de cada clínica ---------- */
+    const DIA_CORTO = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    function textoHorario(id) {
+      const h = (datos.horarios || []).filter(x => String(x.clinica_id) === String(id));
+      if (!h.length) return '';
+      const g = [];
+      for (const x of h) {
+        const k = x.abre + '–' + x.cierra, u = g[g.length - 1];
+        if (u && u.k === k && u.fin === x.dia_semana - 1) u.fin = x.dia_semana;
+        else g.push({ k, ini: x.dia_semana, fin: x.dia_semana });
+      }
+      return 'Atiende: ' + g.map(x =>
+        (x.ini === x.fin ? DIA_CORTO[x.ini] : DIA_CORTO[x.ini] + ' a ' + DIA_CORTO[x.fin]) + ' ' + x.k
+      ).join(' · ');
+    }
+
+    /* ---------- ingreso con PIN ---------- */
+    async function pedirLogin() {
+      sesion = null;
+      aplicarSesion();
+      try {
+        const u = await api('/api/usuarios');
+        $('#l-usuario').innerHTML = u.usuarios.map(n => `<option>${esc(n)}</option>`).join('');
+      } catch (e) {
+        $('#e-login').textContent = e.mensaje;
+      }
+      $('#l-pin').value = '';
+      $('#login').classList.remove('oculto');
+      $('#l-pin').focus();
+    }
+
+    async function entrar() {
+      const b = $('#b-login');
+      b.disabled = true;
+      $('#e-login').textContent = '';
+      limpiarMarcas('#login');
+      try {
+        await api('/api/login', { nombre: $('#l-usuario').value, pin: $('#l-pin').value });
+        $('#login').classList.add('oculto');
+        $('#l-pin').value = '';
+        await cargar();
+        reenviarPendientes();
+      } catch (x) {
+        $('#e-login').textContent = x.mensaje;
+        marcarCampo(x.campo);
+        $('#l-pin').select();
+      }
+      b.disabled = false;
+    }
+
+    $('#b-login').onclick = entrar;
+    $('#l-pin').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+
+    function aplicarSesion() {
+      $('#u-nombre').textContent = sesion ? sesion.nombre : '';
+      $('#u-rol').textContent = sesion ? (sesion.rol === 'doctora' ? 'Acceso completo' : 'Recepción') : '';
+      $('#nav-auditoria').classList.toggle('oculto', !(sesion && sesion.rol === 'doctora'));
+      if (!sesion || sesion.rol !== 'doctora') $('#v-auditoria').classList.add('oculto');
+    }
+
+    $('#b-salir').onclick = async () => {
+      try { await api('/api/logout', {}); } catch (e) {}
+      mostrarVista('nueva');
+      pedirLogin();
+    };
+
+    /* ---------- historial de cambios (solo doctora) ---------- */
+    const ACCIONES = {
+      crear: 'Registró un paciente',
+      agendar: 'Agendó una cita',
+      cancelar: 'Canceló una cita',
+      reactivar: 'Reactivó una cita',
+      ingresar: 'Ingresó al sistema',
+      ingreso_fallido: 'Intento de ingreso con PIN incorrecto'
+    };
+
+    async function pintarAuditoria() {
+      const cont = $('#lista-aud');
+      try {
+        const r = await api('/api/auditoria');
+        cont.innerHTML = r.eventos.map(e => `
+          <div class="card evento ${e.accion === 'ingreso_fallido' ? 'malo' : ''}">
+            <time>${esc(new Date(e.cuando).toLocaleString('es-EC', {
+              day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+            }))}</time>
+            <div><b>${esc(e.usuario)}</b> · ${esc(ACCIONES[e.accion] || e.accion)}</div>
+            ${(e.entidad === 'cita' || e.entidad === 'paciente')
+              ? `<small>${esc(e.entidad)} n.º ${esc(e.entidad_id)}${e.detalle ? ' · ' + esc(e.detalle) : ''}</small>`
+              : ''}
+          </div>
+        `).join('') || '<div class="vacio">Todavía no hay movimientos.</div>';
+      } catch (x) {
+        cont.innerHTML = `<div class="vacio">${esc(x.mensaje)}</div>`;
+      }
+    }
+
+    /* ---------- citas pendientes cuando se cae el internet (Clínica Sur) ---------- */
+    const LLAVE_PEND = 'msls_pendientes';
+    const leerPend = () => {
+      try { return JSON.parse(localStorage.getItem(LLAVE_PEND) || '[]'); } catch (e) { return []; }
+    };
+    const guardarPend = l => {
+      try { localStorage.setItem(LLAVE_PEND, JSON.stringify(l)); return true; } catch (e) { return false; }
+    };
+    const nuevaClave = () => (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+
+    function pintarPend() {
+      const l = leerPend(), box = $('#pendientes');
+      box.classList.toggle('oculto', !l.length);
+      box.innerHTML = !l.length
+        ? ''
+        : `<b>⏳ ${l.length} cita(s) guardada(s) en este equipo, SIN confirmar todavía</b>
+           <small>Se enviarán solas cuando vuelva el internet. Hasta entonces la hora NO está reservada.</small>`
+          + l.map(p => `
+              <div class="pend-fila">
+                <span>${esc(p.texto)}${p.error ? `<br><em>No se pudo confirmar: ${esc(p.error)}</em>` : ''}</span>
+                <button type="button" class="chico" data-clave="${esc(p.clave)}">Descartar</button>
+              </div>
+            `).join('')
+          + '<button type="button" class="chico" id="b-reintentar" style="margin-top:10px">Reintentar ahora</button>';
+    }
+
+    $('#pendientes').onclick = ev => {
+      if (ev.target.id === 'b-reintentar') return reenviarPendientes();
+      const c = ev.target.dataset && ev.target.dataset.clave;
+      if (c) { guardarPend(leerPend().filter(p => p.clave !== c)); pintarPend(); }
+    };
+
+    let enviando = false;
+    async function reenviarPendientes() {
+      if (enviando || !sesion) return;
+      enviando = true;
+      let enviado = false, l = leerPend();
+      for (const p of l) {
+        if (p.error) continue;
+        try {
+          await api('/api/citas', p.cuerpo);
+          l = l.filter(x => x.clave !== p.clave);
+          guardarPend(l);
+          enviado = true;
+          aviso('✔ Se confirmó la cita pendiente: ' + p.texto);
+        } catch (x) {
+          if (x.offline || x.estado === 401) break;
+          p.error = x.mensaje;
+          guardarPend(l); // el servidor la rechazó (ej. la hora ya fue tomada): que una persona decida
+        }
+      }
+      enviando = false;
+      pintarPend();
+      if (enviado) cargar();
+    }
+
+    window.addEventListener('online', reenviarPendientes);
+    setInterval(() => { if (leerPend().some(p => !p.error)) reenviarPendientes(); }, 30000);
+    pintarPend();
+  </script>
 </body>
 </html>
