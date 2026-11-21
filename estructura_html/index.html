@@ -1,1969 +1,1332 @@
-<!DOCTYPE html> <!-- Declara documento HTML5. -->
-<html lang="es"> <!-- Raíz del documento en español. -->
-<head> <!-- Cabecera con metadatos, título y estilos. -->
-  <!-- Codificación UTF-8: permite tildes y ñ. --> <!-- Acepta caracteres especiales del español. -->
-  <meta charset="utf-8"> <!-- Define UTF-8 como juego de caracteres. -->
-  <!-- Hace que la página se adapte al ancho del celular. --> <!-- Configura escalado responsivo en móviles. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ajusta ancho al dispositivo y escala inicial 1. -->
-  <!-- Título que aparece en la pestaña del navegador. --> <!-- Texto mostrado en la pestaña o barra de título. -->
-  <title>Clínica MSLS+ · Agenda de citas</title> <!-- Título principal de la aplicación. -->
-  <!-- Aquí empiezan los estilos (colores, tamaños, posiciones). --> <!-- Bloque CSS interno. -->
-  <style> 
-    /* Variables de color y letra: se cambian aquí y se aplican en toda la página. */ /* Define tokens globales en :root. */
-    :root { /* Selector raíz para variables CSS. */
-      /* Texto principal. */ /* Color base de lectura. */
-      --tinta: #14292b; /* Verde oscuro casi negro. */
-      /* Texto secundario (ayudas, fechas). */ /* Color de menor énfasis. */
-      --suave: #53676a; /* Gris verdoso. */
-      /* Color de bordes y separadores. */ /* Líneas sutiles de división. */
-      --linea: #cddcdc; /* Gris claro frío. */
-      /* Fondo general de la página. */ /* Color base del cuerpo. */
-      --fondo: #eaf3f4; /* Celeste/menta muy suave. */
-      /* Fondo de tarjetas. */ /* Superficie de contenedores principales. */
-      --papel: #fff; /* Blanco puro. */
-      /* Verde azulado principal de la marca. */ /* Color institucional primario. */
-      --teal: #0f4c4e; /* Verde azulado profundo. */
-      /* Variante más clara del verde (botones al pasar el mouse). */ /* Tono hover/acento secundario. */
-      --teal2: #15696b; /* Verde azulado medio. */
-      /* Verde muy claro para resaltados. */ /* Fondo de badges y resúmenes. */
-      --menta: #d9ebe8; /* Verde menta claro. */
-      /* Azul que identifica a Clínica Norte. */ /* Color distintivo de sede Norte. */
-      --cielo: #3d7ea6; /* Azul cielo/acero. */
-      /* Dorado que identifica a Clínica Sur. */ /* Color distintivo de sede Sur. */
-      --oro: #c79a3b; /* Amarillo dorado. */
-      /* Rojo de errores. */ /* Color de alerta y validación fallida. */
-      --peligro: #a2392f; /* Rojo ladrillo. */
-      /* Fondo rosado de los mensajes de error. */ /* Superficie para alertas de error. */
-      --peligro-f: #fbeceb; /* Rosa muy claro. */
-      /* Amarillo suave de avisos. */ /* Fondo de avisos pendientes/estados. */
-      --aviso: #f3e8c4; /* Crema/amarillo pálido. */
-      /* Letra con serifa para títulos. */ /* Pila tipográfica para encabezados. */
-      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; /* Fuentes con serifa. */
-      /* Letra sin serifa para el texto (Atkinson Hyperlegible es muy legible). */ /* Pila tipográfica para lectura fluida. */
-      --sans: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; /* Fuentes sans-serif. */
-    } /* Cierra :root. */
-
-    /* El ancho incluye el relleno y el borde: facilita calcular tamaños. */ /* Modelo de caja uniforme. */
-    * { box-sizing: border-box; } /* Incluye padding y border dentro de width/height. */
-    /* Tamaño base 18px: letra grande para leer con comodidad. */ /* Escala tipográfica base. */
-    html { font-size: 18px; } /* Define 1rem = 18px. */
-    /* Estilo general de la página: sin margen, ocupa toda la altura, usa las variables de arriba. */ /* Estilos del body. */
-    body { /* Selector del cuerpo del documento. */
-      margin: 0; /* Elimina márgenes por defecto. */
-      min-height: 100vh; /* Ocupa al menos el alto de la ventana. */
-      background: var(--fondo); /* Aplica fondo general. */
-      color: var(--tinta); /* Aplica color de texto principal. */
-      font-family: var(--sans); /* Aplica tipografía sin serifa. */
-      line-height: 1.5; /* Espaciado vertical cómodo entre líneas. */
-    } /* Cierra body. */
-    /* Títulos sin margen y con interlineado compacto. */ /* Estilo base para encabezados. */
-    h1, h2, h3 { margin: 0; line-height: 1.15; } /* Quita márgenes y compacta altura de línea. */
-    /* Clase para esconder algo. !important garantiza que gane sobre otros estilos; el JavaScript la agrega y quita. */ /* Utilidad de ocultamiento. */
-    .oculto { display: none !important; } /* Oculta elementos y sobrescribe otros display. */
-    /* Estilo de los íconos: tamaño relativo a la letra, solo contorno, trazo redondeado. */ /* Estilos de íconos SVG. */
-    svg.ic { /* Selector de íconos con clase ic. */
-      width: 1.25em; /* Ancho proporcional al tamaño de fuente. */
-      height: 1.25em; /* Alto proporcional al tamaño de fuente. */
-      fill: none; /* Sin relleno interior. */
-      stroke: currentColor; /* Trazo hereda el color del texto. */
-      stroke-width: 1.8; /* Grosor del trazo. */
-      stroke-linecap: round; /* Extremos redondeados en líneas. */
-      stroke-linejoin: round; /* Esquinas redondeadas en trazos. */
-      flex: none; /* Evita que se encoja en contenedores flex. */
-    } /* Cierra svg.ic. */
-
-    /* ===== PORTADA ===== */ /* Sección de estilos para la vista de portada. */
-    /* Pantalla de inicio: ocupa toda la altura, con la imagen de fondo suave. */ /* Contenedor principal de portada. */
-    .portada { /* Clase .portada. */
-      min-height: 100vh; /* Altura mínima de pantalla completa. */
-      background: #e4efee url('fondo_suave.svg') center/cover no-repeat; /* Fondo suave con imagen SVG centrada y cubierta. */
-    } /* Cierra .portada. */
-    /* Barra superior de la portada: centrada, con la marca a la izquierda y el botón a la derecha. */ /* Cabecera superior. */
-    .p-nav { /* Clase .p-nav. */
-      max-width: 1120px; /* Ancho máximo de navegación. */
-      margin: 0 auto; /* Centra horizontalmente. */
-      padding: 22px 28px; /* Espaciado interno. */
-      display: flex; /* Disposición en fila flexible. */
-      justify-content: space-between; /* Separa elementos a los extremos. */
-      align-items: center; /* Centra verticalmente. */
-    } /* Cierra .p-nav. */
-    /* Nombre MSLS+ de la barra superior. */ /* Estilo del logotipo pequeño. */
-    .marca-mini { /* Clase .marca-mini. */
-      font-family: var(--serif); /* Tipografía con serifa. */
-      font-weight: 700; /* Negrita. */
-      font-size: 1.35rem; /* Tamaño de fuente. */
-      color: var(--teal); /* Color principal de marca. */
-    } /* Cierra .marca-mini. */
-    /* El signo + va en dorado. */ /* Resalta el símbolo '+'. */
-    .marca-mini b { color: var(--oro); } /* Aplica color dorado al '+'. */
-    /* Botón con borde 'Ver citas' (altura mínima de 44px para tocarlo fácil). */ /* Botón de navegación en portada. */
-    .p-nav button { /* Botón dentro de .p-nav. */
-      background: none; /* Fondo transparente. */
-      border: 1.5px solid var(--teal); /* Borde del color principal. */
-      color: var(--teal); /* Texto del color principal. */
-      border-radius: 10px; /* Esquinas redondeadas. */
-      font: inherit; /* Hereda familia y tamaño de fuente. */
-      min-height: 44px; /* Área táctil accesible. */
-      padding: 0 18px; /* Relleno horizontal. */
-      cursor: pointer; /* Cambia cursor a mano al pasar encima. */
-    } /* Cierra .p-nav button. */
-    /* Al pasar el mouse se rellena de verde. */ /* Estado hover del botón. */
-    .p-nav button:hover { background: var(--teal); color: #fff; } /* Rellena fondo y cambia texto a blanco. */
-
-    /* Zona principal de la portada: dos columnas (texto y maqueta). */ /* Bloque hero. */
-    .hero { /* Clase .hero. */
-      max-width: 1120px; /* Limita ancho del bloque. */
-      margin: 0 auto; /* Centra horizontalmente. */
-      padding: 36px 28px 28px; /* Espaciado superior, lateral e inferior. */
-      display: grid; /* Diseño en cuadrícula CSS. */
-      grid-template-columns: 1.05fr 0.95fr; /* Dos columnas casi iguales. */
-      gap: 48px; /* Separación entre columnas. */
-      align-items: center; /* Alinea verticalmente al centro. */
-    } /* Cierra .hero. */
-    /* Línea 'Bienvenido a MSLS+'. */ /* Texto introductorio del hero. */
-    .hero .saludo { margin: 0 0 10px; color: var(--teal2); font-weight: 650; } /* Margen inferior, tono verde y seminegrita. */
-    /* Título grande de la portada. */ /* Encabezado principal del hero. */
-    .hero h1 { /* H1 dentro de .hero. */
-      font-family: var(--serif); /* Fuente serif. */
-      font-size: 3.5rem; /* Tamaño destacado. */
-      font-weight: 700; /* Negrita. */
-      color: var(--teal); /* Color principal. */
-      letter-spacing: -0.015em; /* Ligero ajuste entre letras. */
-    } /* Cierra .hero h1. */
-    /* La palabra 'hora' sin cursiva y en dorado. */ /* Énfasis en palabra clave del titular. */
-    .hero h1 em { font-style: normal; color: var(--oro); } /* Quita cursiva y aplica dorado. */
-    /* Párrafo descriptivo con ancho limitado para leerse mejor. */ /* Texto principal de presentación. */
-    .hero p.lead { /* Párrafo .lead en .hero. */
-      font-size: 1.1rem; /* Tamaño ligeramente mayor al base. */
-      color: var(--suave); /* Color secundario. */
-      max-width: 34ch; /* Limita longitud de línea para facilitar lectura. */
-      margin: 18px 0 28px; /* Márgenes superior e inferior. */
-    } /* Cierra .hero p.lead. */
-    /* Fila de botones que baja de línea si no caben. */ /* Contenedor de acciones del hero. */
-    .acciones { display: flex; gap: 12px; flex-wrap: wrap; } /* Fila flexible con ajuste de línea. */
-
-    /* Botón principal verde, grande y redondeado. */ /* Estilo general de .btn. */
-    .btn { /* Clase .btn. */
-      min-height: 54px; /* Altura cómoda para clic/toque. */
-      border: 0; /* Sin borde. */
-      border-radius: 12px; /* Esquinas redondeadas. */
-      background: var(--teal); /* Fondo verde azulado. */
-      color: #fff; /* Texto blanco. */
-      font: inherit; /* Hereda fuente del documento. */
-      font-weight: 650; /* Peso seminegrita. */
-      font-size: 1.02rem; /* Tamaño de texto del botón. */
-      padding: 0 28px; /* Relleno horizontal. */
-      cursor: pointer; /* Cursor interactivo. */
-      display: inline-flex; /* Permite ícono y texto alineados. */
-      gap: 10px; /* Espacio entre ícono y texto. */
-      align-items: center; /* Centra verticalmente. */
-      justify-content: center; /* Centra horizontalmente. */
-    } /* Cierra .btn. */
-    /* Verde más claro al pasar el mouse. */ /* Hover de .btn. */
-    .btn:hover { background: var(--teal2); } /* Oscurece/aclara al tono secundario. */
-    /* Botón apagado y con cursor de espera mientras se envía. */ /* Estado deshabilitado de .btn. */
-    .btn:disabled { opacity: 0.6; cursor: wait; } /* Reduce opacidad y muestra cursor de espera. */
-    /* Botón secundario: fondo blanco y borde verde. */ /* Variante secundaria .btn.sec. */
-    .btn.sec { background: #fff; color: var(--teal); border: 1.5px solid var(--teal); } /* Estilo invertido con borde. */
-    /* Resalte del botón secundario. */ /* Hover de .btn.sec. */
-    .btn.sec:hover { background: var(--menta); } /* Fondo menta al pasar el cursor. */
-    /* Botón que ocupa todo el ancho. */ /* Variante de ancho completo .btn.bloque. */
-    .btn.bloque { width: 100%; margin-top: 22px; } /* Ocupa 100% del ancho y agrega margen superior. */
-
-    /* Contenedor del dibujo de ejemplo de la agenda. */ /* Marco de la maqueta visual. */
-    .maqueta { position: relative; padding: 10px 0 30px 20px; } /* Permite posicionar aviso flotante y da aire. */
-    /* Tarjeta blanca con sombra de la maqueta. */ /* Card ilustrativa de agenda. */
-    .m-card { /* Clase .m-card. */
-      background: var(--papel); /* Fondo blanco. */
-      border-radius: 18px; /* Bordes redondeados. */
-      box-shadow: 0 18px 40px rgba(15, 76, 78, 0.14); /* Sombra suave con tinte de marca. */
-      padding: 20px 22px; /* Relleno interior. */
-    } /* Cierra .m-card. */
-    /* Encabezado de la tarjeta de la maqueta. */ /* Barra superior de .m-card. */
-    .m-cab { /* Clase .m-cab. */
-      display: flex; /* Disposición en fila. */
-      justify-content: space-between; /* Título a la izquierda y badge a la derecha. */
-      align-items: center; /* Alineación vertical centrada. */
-      margin-bottom: 12px; /* Separación respecto a las filas. */
-    } /* Cierra .m-cab. */
-    /* Título 'Agenda de hoy'. */ /* Estilo del título de la maqueta. */
-    .m-cab b { font-family: var(--serif); font-size: 1.15rem; color: var(--teal); } /* Tipografía serif y color principal. */
-    /* Etiqueta verde 'Sin cruces'. */ /* Badge de estado en la maqueta. */
-    .m-ok { /* Clase .m-ok. */
-      font-size: 0.78rem; /* Tamaño pequeño. */
-      background: var(--menta); /* Fondo menta. */
-      color: var(--teal); /* Texto verde. */
-      padding: 3px 10px; /* Espaciado interno tipo píldora. */
-      border-radius: 999px; /* Bordes completamente redondeados. */
-    } /* Cierra .m-ok. */
-    /* Fila de la maqueta: hora, descripción y punto de color. */ /* Cada cita de ejemplo. */
-    .m-fila { /* Clase .m-fila. */
-      display: grid; /* Cuadrícula de 3 columnas. */
-      grid-template-columns: 56px 1fr auto; /* Hora fija, detalle flexible y marcador de sede. */
-      gap: 12px; /* Espacio entre celdas. */
-      align-items: center; /* Centra verticalmente. */
-      padding: 11px 0; /* Espaciado vertical. */
-      border-top: 1px solid var(--linea); /* Línea divisoria superior. */
-    } /* Cierra .m-fila. */
-    /* Hora en negrita. */ /* Estilo de la hora en la maqueta. */
-    .m-fila time { font-weight: 700; color: var(--teal); } /* Negrita y color verde. */
-    /* Nombre de la clínica en gris. */ /* Subtexto de la fila en la maqueta. */
-    .m-fila small { display: block; color: var(--suave); } /* En bloque y color secundario. */
-    /* Círculo de color que identifica la clínica. */ /* Indicador visual de clínica. */
-    .punto { width: 10px; height: 10px; border-radius: 50%; background: var(--teal2); } /* Círculo de 10px en verde por defecto. */
-    /* Azul = Clínica Norte. */ /* Modificador para sede Norte. */
-    .punto.n { background: var(--cielo); } /* Cambia color a azul cielo. */
-    /* Dorado = Clínica Sur. */ /* Modificador para sede Sur. */
-    .punto.s { background: var(--oro); } /* Cambia color a dorado. */
-    /* Aviso flotante 'Cita cancelada · Deshacer' sobre la maqueta. */ /* Badge flotante inferior. */
-    .m-flota { /* Clase .m-flota. */
-      position: absolute; /* Posicionado respecto a .maqueta. */
-      left: -6px; /* Ligeramente desplazado a la izquierda. */
-      bottom: 0; /* Pegado a la parte inferior. */
-      background: var(--teal); /* Fondo verde principal. */
-      color: #fff; /* Texto blanco. */
-      border-radius: 14px; /* Esquinas redondeadas. */
-      padding: 12px 16px; /* Relleno interno. */
-      font-size: 0.9rem; /* Tamaño de letra. */
-      display: flex; /* Fila con ícono y texto. */
-      gap: 10px; /* Separación entre ícono y texto. */
-      align-items: center; /* Centrado vertical. */
-      box-shadow: 0 12px 28px rgba(15, 76, 78, 0.28); /* Sombra pronunciada. */
-    } /* Cierra .m-flota. */
-    /* Palabra 'Deshacer' subrayada en amarillo. */ /* Destaca acción 'Deshacer' en la maqueta. */
-    .m-flota u { color: #f3d68a; text-underline-offset: 3px; } /* Color amarillo suave y separación del subrayado. */
-
-    /* Fila de tres tarjetas, una por clínica. */ /* Grilla de sedes. */
-    .sedes { /* Clase .sedes. */
-      max-width: 1120px; /* Ancho máximo alineado con el hero. */
-      margin: 0 auto; /* Centrado horizontal. */
-      padding: 8px 28px; /* Espaciado lateral y vertical. */
-      display: grid; /* Cuadrícula CSS. */
-      grid-template-columns: repeat(3, 1fr); /* Tres columnas iguales. */
-      gap: 16px; /* Separación entre tarjetas. */
-    } /* Cierra .sedes. */
-    /* Cada tarjeta de clínica. */ /* Estilo de .sede. */
-    .sede { /* Clase .sede. */
-      background: rgba(255, 255, 255, 0.82); /* Blanco translúcido. */
-      border: 1px solid var(--linea); /* Borde sutil. */
-      border-radius: 16px; /* Esquinas redondeadas. */
-      padding: 18px 20px; /* Relleno interno. */
-      display: flex; /* Fila con indicador y textos. */
-      gap: 14px; /* Espacio entre punto y textos. */
-      align-items: center; /* Centrado vertical. */
-    } /* Cierra .sede. */
-    /* Punto más grande en las tarjetas de clínica. */ /* Amplía .punto dentro de .sede. */
-    .sede .punto { width: 14px; height: 14px; } /* Círculo de 14px. */
-    /* Nombre de la clínica. */ /* Título de cada sede. */
-    .sede b { display: block; font-family: var(--serif); font-size: 1.1rem; } /* En bloque, fuente serif y tamaño 1.1rem. */
-    /* Descripción en gris. */ /* Subtítulo de la sede. */
-    .sede small { color: var(--suave); } /* Color secundario. */
-
-    /* Zona de Visión y 'A qué nos dedicamos' en dos columnas. */ /* Contenedor de pilares institucionales. */
-    .pilares { /* Clase .pilares. */
-      max-width: 1120px; /* Ancho máximo. */
-      margin: 0 auto; /* Centrado horizontal. */
-      padding: 16px 28px 56px; /* Espaciado con mayor margen inferior. */
-      display: grid; /* Cuadrícula de dos columnas. */
-      grid-template-columns: 1fr 1fr; /* Dos columnas iguales. */
-      gap: 16px; /* Separación entre tarjetas. */
-    } /* Cierra .pilares. */
-    /* Tarjeta verde con texto claro. */ /* Estilo base de .pilar. */
-    .pilar { /* Clase .pilar. */
-      background: var(--teal); /* Fondo verde principal. */
-      color: #e9f4f2; /* Texto claro de alto contraste. */
-      border-radius: 18px; /* Esquinas redondeadas. */
-      padding: 26px 28px; /* Relleno interno. */
-    } /* Cierra .pilar. */
-    /* La segunda tarjeta va en blanco con borde. */ /* Estilo alterno para el segundo pilar. */
-    .pilar:nth-child(2) { /* Segundo hijo de tipo .pilar. */
-      background: var(--papel); /* Fondo blanco. */
-      color: var(--tinta); /* Texto oscuro principal. */
-      border: 1px solid var(--linea); /* Borde suave. */
-    } /* Cierra .pilar:nth-child(2). */
-    /* Título de cada pilar. */ /* Encabezado de .pilar. */
-    .pilar h2 { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 8px; } /* Fuente serif, tamaño 1.4rem y margen inferior. */
-    /* Título verde en la tarjeta blanca. */ /* Color del título en el segundo pilar. */
-    .pilar:nth-child(2) h2 { color: var(--teal); } /* Aplica verde principal al h2. */
-    /* Párrafo sin margen. */ /* Texto descriptivo del pilar. */
-    .pilar p { margin: 0; } /* Elimina márgenes por defecto. */
-
-    /* A partir de aquí: estilos de la pantalla de trabajo. */ /* Transición hacia la interfaz interna. */
-    /* ===== SISTEMA ===== */ /* Estilos de la aplicación principal. */
-    /* Estructura del sistema: columna lateral de 270px y contenido. */ /* Layout principal de la app. */
-    .app { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; } /* Menú lateral fijo y área principal flexible. */
-    /* Menú lateral verde, fijo (sticky) mientras se baja la página. */ /* Barra lateral de navegación. */
-    aside { /* Elemento aside. */
-      background: var(--teal); /* Fondo verde principal. */
-      color: #e6f2f0; /* Texto claro. */
-      padding: 26px 16px; /* Relleno interno. */
-      display: flex; /* Contenedor flexible vertical. */
-      flex-direction: column; /* Apila elementos en columna. */
-      gap: 6px; /* Separación entre elementos. */
-      position: sticky; /* Se mantiene pegado al hacer scroll. */
-      top: 0; /* Anclado arriba. */
-      height: 100vh; /* Ocupa toda la altura de la ventana. */
-    } /* Cierra aside. */
-    /* Nombre ClinAgenda del menú lateral. */ /* Marca en la barra lateral. */
-    .logo { /* Clase .logo. */
-      font-family: var(--serif); /* Tipografía serif. */
-      font-weight: 700; /* Negrita. */
-      font-size: 1.45rem; /* Tamaño de logo. */
-      padding: 0 12px 22px; /* Relleno lateral e inferior. */
-      color: #fff; /* Texto blanco. */
-    } /* Cierra .logo. */
-    /* 'Agenda' en dorado claro. */ /* Resalta segunda parte del logo. */
-    .logo b { color: #f3d68a; } /* Color dorado claro. */
-    /* Botones del menú: ancho completo, ícono y texto en fila. */ /* Elementos de navegación lateral. */
-    nav button { /* Botones dentro de nav. */
-      width: 100%; /* Ocupa todo el ancho del menú. */
-      display: flex; /* Ícono y etiqueta en fila. */
-      gap: 12px; /* Separación entre ícono y texto. */
-      align-items: center; /* Centrado vertical. */
-      text-align: left; /* Texto alineado a la izquierda. */
-      background: transparent; /* Sin fondo por defecto. */
-      border: 0; /* Sin borde. */
-      color: #cfe5e2; /* Texto verde claro. */
-      font: inherit; /* Hereda tipografía. */
-      padding: 13px 14px; /* Espaciado interno. */
-      border-radius: 12px; /* Esquinas redondeadas. */
-      cursor: pointer; /* Cursor de mano. */
-    } /* Cierra nav button. */
-    /* Resalte al pasar el mouse. */ /* Hover de botones del menú. */
-    nav button:hover { background: rgba(255, 255, 255, 0.09); } /* Ligero velo blanco. */
-    /* Botón de la sección activa: fondo blanco. */ /* Estado activo (.on) en navegación. */
-    nav button.on { background: #fff; color: var(--teal); font-weight: 650; } /* Fondo blanco, texto verde y seminegrita. */
-
-    /* Zona del usuario al final del menú (margin-top:auto la empuja abajo). */ /* Pie de la barra lateral. */
-    .usuario { /* Clase .usuario. */
-      margin-top: auto; /* Empuja el bloque hacia el fondo del menú. */
-      padding: 14px 10px 0; /* Espaciado superior y horizontal. */
-      border-top: 1px solid rgba(255, 255, 255, 0.18); /* Separador sutil superior. */
-    } /* Cierra .usuario. */
-    /* Etiqueta en tono claro. */ /* Estilo de label dentro de .usuario. */
-    .usuario label { color: #b9d6d2; } /* Color verde pastel claro. */
-    /* Botones de texto subrayado: 'Volver al inicio' y 'Cerrar sesión'. */ /* Acciones secundarias en aside. */
-    aside .btn-volver { /* Clase .btn-volver dentro de aside. */
-      margin-top: 10px; /* Separación superior. */
-      background: none; /* Sin fondo. */
-      border: 0; /* Sin borde. */
-      color: #b9d6d2; /* Texto claro. */
-      font: inherit; /* Hereda fuente. */
-      font-size: 0.9rem; /* Tamaño algo menor. */
-      cursor: pointer; /* Cursor de mano. */
-      text-align: left; /* Alineado a la izquierda. */
-      padding: 8px 14px; /* Relleno interno. */
-      text-decoration: underline; /* Subrayado de enlace/acción. */
-      text-underline-offset: 3px; /* Separa subrayado del texto. */
-    } /* Cierra aside .btn-volver. */
-
-    /* Área de contenido centrada con ancho máximo. */ /* Contenedor principal de vistas. */
-    main { /* Elemento main. */
-      padding: 30px 34px 64px; /* Relleno general y margen inferior amplio. */
-      max-width: 1040px; /* Ancho máximo de lectura/trabajo. */
-      width: 100%; /* Ancho completo hasta el máximo. */
-      margin: 0 auto; /* Centra horizontalmente. */
-    } /* Cierra main. */
-    /* Encabezado de cada sección: título a la izquierda, fecha a la derecha. */ /* Cabecera de vista. */
-    .cab { /* Clase .cab. */
-      display: flex; /* Fila flexible. */
-      justify-content: space-between; /* Separa título y etiqueta derecha. */
-      align-items: flex-end; /* Alinea por la base. */
-      gap: 16px; /* Espacio entre bloques. */
-      flex-wrap: wrap; /* Permite envolver en pantallas estrechas. */
-      margin-bottom: 22px; /* Separación inferior. */
-    } /* Cierra .cab. */
-    /* Título de sección. */ /* Encabezado h1 dentro de .cab. */
-    .cab h1 { font-family: var(--serif); font-size: 2rem; color: var(--teal); } /* Fuente serif, tamaño 2rem y color principal. */
-    /* Descripción en gris con ancho máximo. */ /* Subtexto de la sección. */
-    .cab p { margin: 6px 0 0; color: var(--suave); max-width: 54ch; } /* Margen superior, color suave y ancho legible. */
-    /* Etiqueta con la fecha de hoy. */ /* Badge de fecha actual. */
-    .fecha-hoy { /* Clase .fecha-hoy. */
-      font-size: 0.9rem; /* Tamaño de texto. */
-      color: var(--teal2); /* Color verde secundario. */
-      background: var(--menta); /* Fondo menta. */
-      padding: 6px 14px; /* Relleno interno. */
-      border-radius: 999px; /* Forma de píldora. */
-      text-transform: capitalize; /* Primera letra de palabras en mayúscula. */
-      white-space: nowrap; /* Evita salto de línea dentro de la fecha. */
-    } /* Cierra .fecha-hoy. */
-
-    /* Etiquetas de los campos. */ /* Estilo general de label. */
-    label { display: block; font-size: 0.88rem; color: var(--suave); margin: 16px 0 6px; } /* En bloque, tamaño 0.88rem y márgenes. */
-    /* Campos de texto y listas: altura cómoda, borde visible y letra heredada. */ /* Controles de formulario. */
-    input, select { /* Inputs y selects. */
-      width: 100%; /* Ancho completo del contenedor. */
-      min-height: 50px; /* Altura cómoda para uso táctil/ratón. */
-      font: inherit; /* Hereda tipografía. */
-      color: var(--tinta); /* Color de texto principal. */
-      background: #fff; /* Fondo blanco. */
-      border: 1.5px solid #aebfc0; /* Borde gris azulado. */
-      border-radius: 10px; /* Esquinas redondeadas. */
-      padding: 8px 14px; /* Relleno interior. */
-    } /* Cierra input, select. */
-    /* Color del texto de ejemplo. */ /* Placeholder de inputs. */
-    input::placeholder { color: #7d8d90; } /* Gris medio para texto de ayuda. */
-    /* Contorno visible al enfocar un campo o botón (ayuda a quien usa teclado). */ /* Foco accesible por teclado. */
-    input:focus, select:focus, button:focus-visible { /* Elementos enfocables. */
-      outline: 3px solid #7fb6b8; /* Anillo de enfoque visible. */
-      outline-offset: 2px; /* Separa el anillo del borde del elemento. */
-    } /* Cierra focus. */
-    /* Campo con error: borde rojo y fondo rosado. */ /* Estado inválido de accesibilidad. */
-    input[aria-invalid="true"], select[aria-invalid="true"] { /* Controles marcados como inválidos. */
-      border-color: var(--peligro); /* Borde rojo de error. */
-      background: var(--peligro-f); /* Fondo rosado claro. */
-    } /* Cierra aria-invalid="true". */
-    /* Texto pequeño de ayuda bajo un campo. */ /* Ayuda contextual. */
-    .ayuda { display: block; font-size: 0.8rem; color: var(--suave); margin-top: 4px; } /* Texto pequeño en bloque debajo del campo. */
-    /* Listas dentro del menú lateral. */ /* Ajuste de select en aside. */
-    aside select { background: rgba(255, 255, 255, 0.95); } /* Fondo casi blanco para contrastar en aside. */
-
-    /* Tarjeta blanca con borde y esquinas redondeadas; base de casi todo el contenido. */ /* Contenedor .card. */
-    .card { /* Clase .card. */
-      background: var(--papel); /* Fondo blanco. */
-      border: 1px solid var(--linea); /* Borde suave. */
-      border-radius: 16px; /* Esquinas redondeadas. */
-      padding: 24px; /* Relleno interno. */
-      margin-bottom: 14px; /* Separación entre tarjetas. */
-    } /* Cierra .card. */
-    /* Título dentro de una tarjeta. */ /* Encabezado h3 en .card. */
-    .card h3 { /* H3 dentro de .card. */
-      font-family: var(--serif); /* Fuente serif. */
-      font-size: 1.15rem; /* Tamaño de subtítulo. */
-      color: var(--teal); /* Color principal. */
-      margin-bottom: 2px; /* Pequeño margen inferior. */
-    } /* Cierra .card h3. */
-    /* Dos columnas iguales. */ /* Grilla de 2 columnas. */
-    .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; } /* Dos columnas de igual ancho con separación de 14px. */
-    /* Formulario a la izquierda y resumen de 320px a la derecha. */ /* Layout de nueva cita. */
-    .dos { display: grid; grid-template-columns: 1fr 320px; gap: 18px; align-items: start; } /* Columna principal fluida y panel lateral fijo de 320px. */
-    /* Tarjeta de resumen: verde claro y fija al bajar la página. */ /* Panel de resumen. */
-    .resumen { background: var(--menta); border: 0; position: sticky; top: 20px; } /* Fondo menta, sin borde y pegajoso al hacer scroll. */
-    /* Lista de datos del resumen. */ /* Lista de definiciones dl. */
-    .resumen dl { margin: 14px 0 0; } /* Margen superior. */
-    /* Nombre de cada dato. */ /* Etiqueta de definición dt. */
-    .resumen dt { font-size: 0.8rem; color: var(--teal2); margin-top: 12px; } /* Texto pequeño, color verde medio y margen superior. */
-    /* Valor de cada dato. */ /* Valor dd en resumen. */
-    .resumen dd { margin: 2px 0 0; font-weight: 650; } /* Seminegrita con ligero margen superior. */
-    /* Valor aún sin elegir: gris. */ /* Estado vacío del resumen. */
-    .resumen dd.vacio-r { color: #7a9a97; font-weight: 400; } /* Tono apagado y peso normal cuando no hay selección. */
-
-    /* Botón pequeño (Cancelar, Deshacer, Descartar). */ /* Estilo de .chico. */
-    .chico { /* Clase .chico. */
-      min-height: 44px; /* Altura accesible. */
-      padding: 0 18px; /* Relleno horizontal. */
-      border-radius: 10px; /* Esquinas redondeadas. */
-      border: 1.5px solid var(--linea); /* Borde suave. */
-      background: #fff; /* Fondo blanco. */
-      color: var(--tinta); /* Texto oscuro. */
-      font: inherit; /* Hereda fuente. */
-      cursor: pointer; /* Cursor interactivo. */
-    } /* Cierra .chico. */
-    /* Resalte. */ /* Hover de .chico. */
-    .chico:hover { background: var(--menta); } /* Fondo menta al pasar el cursor. */
-    /* Variante roja para cancelar. */ /* Modificador .peligro. */
-    .chico.peligro { border-color: #d9a8a3; color: var(--peligro); } /* Borde y texto rojizos. */
-    /* Resalte rojo. */ /* Hover de .chico.peligro. */
-    .chico.peligro:hover { background: var(--peligro-f); } /* Fondo rosado al pasar el cursor. */
-    /* Variante verde para deshacer. */ /* Modificador .ok. */
-    .chico.ok { border-color: var(--teal); color: var(--teal); } /* Borde y texto en verde principal. */
-
-    /* Cuadro rojo de mensajes de error. */ /* Caja de alerta .error. */
-    .error { /* Clase .error. */
-      background: var(--peligro-f); /* Fondo rosado claro. */
-      border: 1.5px solid #d9a8a3; /* Borde rojo suave. */
-      color: #6e231c; /* Texto rojo oscuro de alto contraste. */
-      border-radius: 10px; /* Esquinas redondeadas. */
-      padding: 12px 16px; /* Relleno interno. */
-      margin-top: 16px; /* Separación superior. */
-    } /* Cierra .error. */
-    /* Si no tiene texto, se esconde. */ /* Oculta .error cuando está vacío. */
-    .error:empty { display: none; } /* Evita mostrar caja vacía. */
-
-    /* Tres contadores en fila. */ /* Grilla de estadísticas. */
-    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 6px; } /* Tres tarjetas iguales en fila. */
-    /* Tarjeta de un contador. */ /* Estilo de .stat. */
-    .stat { /* Clase .stat. */
-      background: var(--papel); /* Fondo blanco. */
-      border: 1px solid var(--linea); /* Borde suave. */
-      border-radius: 14px; /* Esquinas redondeadas. */
-      padding: 14px 18px; /* Relleno interno. */
-    } /* Cierra .stat. */
-    /* Número grande. */ /* Cifra principal en .stat. */
-    .stat b { /* Elemento b dentro de .stat. */
-      display: block; /* En bloque para ocupar su línea. */
-      font-family: var(--serif); /* Fuente serif. */
-      font-size: 1.9rem; /* Tamaño grande. */
-      color: var(--teal); /* Color principal. */
-      line-height: 1.1; /* Altura de línea compacta. */
-    } /* Cierra .stat b. */
-    /* Descripción del contador. */ /* Etiqueta descriptiva en .stat. */
-    .stat span { font-size: 0.85rem; color: var(--suave); } /* Texto pequeño y secundario. */
-
-    /* Título de cada día en la lista de citas. */ /* Encabezado agrupador por fecha. */
-    .dia { /* Clase .dia. */
-      margin: 26px 2px 10px; /* Márgenes superior, lateral e inferior. */
-      font-family: var(--serif); /* Fuente serif. */
-      font-size: 1.15rem; /* Tamaño de subtítulo. */
-      font-weight: 700; /* Negrita. */
-      text-transform: capitalize; /* Capitaliza nombres de día y mes. */
-      color: var(--teal); /* Color verde principal. */
-    } /* Cierra .dia. */
-    /* Tarjeta de una cita, con borde izquierdo del color de la clínica. */ /* Estilo de tarjeta .cita. */
-    .cita { /* Clase .cita. */
-      display: flex; /* Elementos en fila. */
-      gap: 16px; /* Separación entre hora, datos y botón. */
-      align-items: center; /* Centrado vertical. */
-      flex-wrap: wrap; /* Permite envolver en pantallas pequeñas. */
-      border-left: 6px solid var(--teal2); /* Franja lateral verde por defecto. */
-      padding: 16px 20px; /* Relleno interno. */
-    } /* Cierra .cita. */
-    /* Borde azul en Clínica Norte. */ /* Modificador .norte en .cita. */
-    .cita.norte { border-left-color: var(--cielo); } /* Franja azul cielo. */
-    /* Borde dorado en Clínica Sur. */ /* Modificador .sur en .cita. */
-    .cita.sur { border-left-color: var(--oro); } /* Franja dorada. */
-    /* Hora grande de la cita. */ /* Estilo de .hora. */
-    .hora { /* Clase .hora. */
-      font-family: var(--serif); /* Fuente serif. */
-      font-size: 1.5rem; /* Tamaño destacado. */
-      font-weight: 700; /* Negrita. */
-      min-width: 80px; /* Ancho mínimo uniforme. */
-      color: var(--teal); /* Color verde principal. */
-    } /* Cierra .hora. */
-    /* Bloque con paciente y médico; ocupa el espacio sobrante. */ /* Columna central de información. */
-    .info { flex: 1; min-width: 180px; } /* Crece para llenar espacio disponible con ancho mínimo. */
-    /* Médico y clínica en gris. */ /* Subtexto de la cita. */
-    .info small { color: var(--suave); display: block; } /* En bloque y color suave. */
-    /* Etiqueta amarilla 'Cancelada'. */ /* Badge de cita cancelada. */
-    .chip { /* Clase .chip. */
-      display: inline-block; /* En línea con propiedades de bloque. */
-      padding: 2px 10px; /* Relleno compacto. */
-      border-radius: 999px; /* Forma redondeada. */
-      font-size: 0.78rem; /* Texto pequeño. */
-      margin-left: 8px; /* Separación respecto al nombre. */
-      background: var(--aviso); /* Fondo amarillo suave. */
-      color: #4d4220; /* Texto marrón oscuro legible. */
-    } /* Cierra .chip. */
-    /* Cita cancelada: fondo gris y borde apagado. */ /* Estado visual de cita cancelada. */
-    .cita.cancelada { background: #f3f6f6; border-left-color: #b6c4c4; } /* Fondo gris claro y borde apagado. */
-    /* Hora y nombre tachados. */ /* Tacha hora y paciente cuando está cancelada. */
-    .cancelada .hora, .cancelada .info b { /* Selectores dentro de .cancelada. */
-      text-decoration: line-through; /* Línea tachada. */
-      color: var(--suave); /* Color atenuado. */
-    } /* Cierra tachado. */
-    /* Mensaje de lista vacía. */ /* Estado vacío de listas. */
-    .vacio { text-align: center; color: var(--suave); padding: 40px 10px; } /* Centrado, color suave y relleno vertical. */
-
-    /* Tarjeta de paciente: avatar y datos. */ /* Estilo de .pac. */
-    .pac { display: flex; gap: 14px; align-items: center; padding: 14px 18px; } /* Fila con avatar y datos del paciente. */
-    /* Círculo con las iniciales del paciente. */ /* Estilo de .avatar. */
-    .avatar { /* Clase .avatar. */
-      width: 42px; /* Diámetro de 42px. */
-      height: 42px; /* Altura de 42px. */
-      border-radius: 50%; /* Círculo perfecto. */
-      background: var(--menta); /* Fondo menta. */
-      color: var(--teal); /* Iniciales en verde principal. */
-      display: grid; /* Cuadrícula para centrar. */
-      place-items: center; /* Centra horizontal y verticalmente. */
-      font-weight: 700; /* Negrita. */
-      flex: none; /* Evita compresión en flex. */
-    } /* Cierra .avatar. */
-    /* Datos secundarios del paciente. */ /* Línea informativa de .pac. */
-    .pac small { display: block; color: var(--suave); font-size: 0.88rem; } /* En bloque, color suave y tamaño 0.88rem. */
-
-    /* Mensaje temporal flotante abajo al centro. */ /* Estilo del toast #toast. */
-    #toast { /* Selector #toast. */
-      position: fixed; /* Fijo respecto a la ventana. */
-      left: 50%; /* Centrado horizontal inicial. */
-      bottom: 90px; /* Separado del borde inferior. */
-      transform: translateX(-50%); /* Compensa su propio ancho para centrar exacto. */
-      background: var(--tinta); /* Fondo oscuro. */
-      color: #fff; /* Texto blanco. */
-      padding: 12px 20px; /* Relleno interno. */
-      border-radius: 12px; /* Esquinas redondeadas. */
-      display: flex; /* Fila con mensaje y posible acción. */
-      gap: 16px; /* Espacio entre texto y botón. */
-      align-items: center; /* Centrado vertical. */
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22); /* Sombra flotante. */
-      z-index: 9; /* Por encima del contenido normal. */
-      max-width: 92vw; /* Limita ancho en pantallas pequeñas. */
-    } /* Cierra #toast. */
-    /* Botón de texto dentro del mensaje (por ejemplo 'Deshacer'). */ /* Acción en #toast. */
-    #toast button { /* Botón dentro de #toast. */
-      background: none; /* Sin fondo. */
-      border: 0; /* Sin borde. */
-      color: #a9dcdc; /* Celeste claro contrastante. */
-      font: inherit; /* Hereda fuente. */
-      font-weight: 700; /* Negrita. */
-      cursor: pointer; /* Cursor interactivo. */
-      min-height: 40px; /* Área táctil cómoda. */
-    } /* Cierra #toast button. */
-
-    /* Cuadro amarillo de citas guardadas sin internet. */ /* Contenedor de cola offline. */
-    .aviso-pend { /* Clase .aviso-pend. */
-      background: var(--aviso); /* Fondo amarillo claro. */
-      border: 1.5px solid var(--oro); /* Borde dorado. */
-      border-radius: 14px; /* Esquinas redondeadas. */
-      padding: 14px 18px; /* Relleno interno. */
-      margin-bottom: 18px; /* Margen inferior. */
-    } /* Cierra .aviso-pend. */
-    /* Texto explicativo del aviso. */ /* Descripción en .aviso-pend. */
-    .aviso-pend small { display: block; margin: 4px 0 10px; color: #4d4220; } /* En bloque con márgenes y color marrón oscuro. */
-    /* Fila de cada cita pendiente. */ /* Ítem en la lista de pendientes. */
-    .pend-fila { /* Clase .pend-fila. */
-      display: flex; /* Fila con texto y botón descartar. */
-      justify-content: space-between; /* Separa texto y botón. */
-      gap: 12px; /* Espacio entre elementos. */
-      align-items: center; /* Centrado vertical. */
-      padding: 8px 0; /* Espaciado vertical. */
-      border-top: 1px solid rgba(0, 0, 0, 0.12); /* Línea separadora superior. */
-    } /* Cierra .pend-fila. */
-    /* Texto del error en rojo. */ /* Detalle de rechazo en pendiente. */
-    .pend-fila em { color: var(--peligro); font-style: normal; } /* Color rojo y sin cursiva. */
-
-    /* NUEVO: estilos de la pantalla de ingreso (ver explicación línea por línea más abajo). */ /* Sección de estilos del modal de login. */
-    /* ===== INGRESO (pantalla completa, oscuro por defecto; el botón cambia a claro) ===== */ /* Tema por defecto oscuro. */
-    /* Pantalla completa. Define aquí las variables de color del tema oscuro (--l-...) que usa todo el ingreso. */ /* Contenedor #login. */
-    #login { /* Selector #login. */
-      /* Fondo, tarjeta, borde, texto principal y texto suave (oscuro). */ /* Variables base oscuras. */
-      --l-fondo: #0f1723; --l-card: #172231; --l-borde: #2a3850; --l-texto: #eef2f8; --l-suave: #93a4bd; /* Paleta oscura principal. */
-      /* Campos, color del botón, texto del botón, color de foco y de error (oscuro). */ /* Variables interactivas oscuras. */
-      --l-campo: #131d2b; --l-acento: #7b9cff; --l-sobre-acento: #0f1723; --l-foco: #5b7cff; --l-error: #ff9b94; /* Paleta oscura para controles y alertas. */
-      /* Fija, cubre todo (inset:0), por encima de la app (z-index) y con scroll si la pantalla es pequeña. */ /* Posicionamiento modal. */
-      position: fixed; inset: 0; z-index: 20; overflow-y: auto; /* Cubre toda la pantalla sobre el resto de vistas. */
-      /* Centra la tarjeta horizontal y verticalmente. */ /* Centrado de contenido. */
-      display: grid; place-items: center; padding: 24px 16px; /* Centra la tarjeta con relleno perimetral. */
-      /* Aplica el fondo y color de texto del tema. */ /* Colores activos del modal. */
-      background: var(--l-fondo); color: var(--l-texto); /* Aplica fondo y texto del tema actual. */
-    } /* Cierra #login. */
-    /* Cuando data-tema vale 'claro', se redefinen las mismas variables con colores claros. */ /* Sobrescritura a tema claro. */
-    #login[data-tema="claro"] { /* Selector cuando data-tema="claro". */
-      /* Colores del tema claro (fondo, tarjeta, borde, texto, texto suave). */ /* Variables base claras. */
-      --l-fondo: #eaf3f4; --l-card: #ffffff; --l-borde: #cddcdc; --l-texto: #14292b; --l-suave: #53676a; /* Paleta clara principal. */
-      /* Colores del tema claro (campo, acento, texto del botón, foco, error). */ /* Variables interactivas claras. */
-      --l-campo: #ffffff; --l-acento: #2f55d4; --l-sobre-acento: #ffffff; --l-foco: #2f55d4; --l-error: #a2392f; /* Paleta clara para controles y alertas. */
-    } /* Cierra #login[data-tema="claro"]. */
-    /* Botón de modo claro/oscuro fijo arriba a la derecha. */ /* Selector de tema en esquina superior derecha. */
-    #l-tema { /* Botón #l-tema. */
-      position: fixed; top: 16px; right: 16px; display: flex; align-items: center; gap: 8px; /* Posición fija superior derecha. */
-      background: var(--l-card); color: var(--l-texto); border: 1px solid var(--l-borde); /* Colores y borde según tema. */
-      border-radius: 12px; padding: 10px 14px; font: 600 0.85rem var(--sans); cursor: pointer; /* Estilo de botón compacto. */
-    } /* Cierra #l-tema. */
-    /* Tarjeta del formulario: ancho máximo 460px, bordes redondeados, sin la sombra de .card. */ /* Contenedor del formulario de login. */
-    .login-card { /* Clase .login-card. */
-      width: min(460px, 100%); margin: 0; padding: 32px 34px; /* Ancho adaptable hasta 460px y relleno generoso. */
-      background: var(--l-card); border: 1px solid var(--l-borde); border-radius: 20px; box-shadow: none; /* Estilo limpio de tarjeta modal. */
-    } /* Cierra .login-card. */
-    /* Logo y nombre en fila. */ /* Encabezado de marca en login. */
-    .l-marca { display: flex; align-items: center; gap: 14px; } /* Fila centrada verticalmente. */
-    /* Cuadro azul del logo con el ícono centrado. */ /* Contenedor del isotipo. */
-    .l-logo { width: 42px; height: 42px; border-radius: 10px; background: var(--l-foco); color: #fff; display: grid; place-items: center; } /* Cuadro con ícono centrado. */
-    /* Tamaño del ícono del logo. */ /* Ajusta tamaño del SVG del logo. */
-    .l-logo svg.ic { width: 24px; height: 24px; } /* Ícono de 24px. */
-    /* Título MSLS+ grande y en negrita. */ /* Título de marca en login. */
-    .login-card h2 { font: 700 1.9rem var(--sans); color: var(--l-texto); margin: 0; letter-spacing: -0.01em; } /* Tipografía y tamaño destacados. */
-    /* Frase 'La agenda de citas de la clínica.' */ /* Subtítulo descriptivo del login. */
-    .l-lema { color: var(--l-suave); margin: 18px 0 4px; font-size: 1.02rem; } /* Color suave y espaciado. */
-    /* Etiquetas Usuario y Contraseña en negrita. */ /* Etiquetas de campos en login. */
-    .login-card label { color: var(--l-texto); font-weight: 700; margin: 20px 0 8px; font-size: 0.92rem; } /* Negrita y margen superior. */
-    /* Campos del ingreso con los colores del tema. */ /* Inputs dentro de .login-card. */
-    .login-card input { /* Entradas de texto/PIN en login. */
-      width: 100%; background: var(--l-campo); color: var(--l-texto); /* Ancho completo y colores del tema. */
-      border: 1px solid var(--l-borde); border-radius: 10px; padding: 13px 14px; font-size: 1rem; /* Borde y relleno cómodos. */
-    } /* Cierra .login-card input. */
-    /* Al enfocar: borde y halo azul. */ /* Estado focus de inputs en login. */
-    .login-card input:focus { outline: none; border-color: var(--l-foco); box-shadow: 0 0 0 2px var(--l-foco); } /* Resalta borde y agrega anillo de foco. */
-    /* Con error: borde del color de error. */ /* Estado inválido de inputs en login. */
-    .login-card input[aria-invalid="true"] { border-color: var(--l-error); box-shadow: none; } /* Borde de error sin halo extra. */
-    /* Mensaje de error del ingreso; min-height evita que el formulario salte al aparecer. */ /* Contenedor #e-login. */
-    #e-login { color: var(--l-error); min-height: 1.4em; margin-top: 12px; font-size: 0.92rem; } /* Reserva altura mínima y colorea el error. */
-    /* Botón Entrar a todo el ancho con el color de acento. */ /* Botón principal de login. */
-    #b-login { /* Botón #b-login. */
-      width: 100%; margin-top: 8px; padding: 14px; border: 0; border-radius: 10px; cursor: pointer; /* Ancho completo y esquinas redondeadas. */
-      background: var(--l-acento); color: var(--l-sobre-acento); font: 700 1.05rem var(--sans); /* Colores y fuente en negrita. */
-    } /* Cierra #b-login. */
-    /* Apagado mientras se envía. */ /* Estado disabled de #b-login. */
-    #b-login:disabled { opacity: 0.6; cursor: wait; } /* Atenúa y muestra cursor de espera. */
-    /* Contorno visible al navegar con la tecla Tab. */ /* Foco por teclado en controles de login. */
-    #b-login:focus-visible, #l-tema:focus-visible, .l-cuenta:focus-visible { outline: 2px solid var(--l-foco); outline-offset: 2px; } /* Resalte visible para teclado. */
-    /* Bloque de cuentas de prueba. */ /* Contenedor de accesos rápidos de prueba. */
-    .l-pruebas { margin-top: 20px; font-size: 0.86rem; color: var(--l-suave); } /* Texto pequeño en color suave. */
-    /* Cada fila de cuenta de prueba: usuario a la izquierda, rol a la derecha, línea separadora arriba. */ /* Botón .l-cuenta. */
-    .l-cuenta { /* Clase .l-cuenta. */
-      display: flex; justify-content: space-between; gap: 12px; width: 100%; text-align: left; /* Distribuye usuario y rol en fila. */
-      background: none; border: 0; border-top: 1px solid var(--l-borde); padding: 9px 0; /* Separador superior y relleno vertical. */
-      color: var(--l-suave); font: inherit; cursor: pointer; /* Texto suave y cursor interactivo. */
-    } /* Cierra .l-cuenta. */
-    /* El nombre de usuario resalta. */ /* Negrita en .l-cuenta. */
-    .l-cuenta b { color: var(--l-texto); } /* Destaca el nombre del usuario. */
-    /* Nombre del usuario en el menú lateral. */ /* Estilo de .u-nombre. */
-    .u-nombre { display: block; font-size: 0.9rem; color: #fff; margin-bottom: 2px; } /* En bloque, blanco y pequeño margen inferior. */
-    /* Rol del usuario en el menú lateral. */ /* Estilo de .u-rol. */
-    .u-rol { display: block; font-size: 0.78rem; color: #b9d6d2; } /* En bloque, tono claro y tamaño menor. */
-
-    /* Fila del historial: fecha a la izquierda, detalle a la derecha. */ /* Estilo de .evento en auditoría. */
-    .evento { display: grid; grid-template-columns: 150px 1fr; gap: 4px 16px; padding: 12px 18px; } /* Columna fija de fecha y columna flexible de acción. */
-    /* Fecha del evento. */ /* Elemento time en .evento. */
-    .evento time { color: var(--suave); font-size: 0.88rem; } /* Color secundario y tamaño 0.88rem. */
-    /* Detalle bajo el evento. */ /* Elemento small en .evento. */
-    .evento small { color: var(--suave); grid-column: 2; } /* Alineado bajo la segunda columna. */
-    /* Evento de intento fallido: borde rojo. */ /* Modificador .malo en .evento. */
-    .evento.malo { border-left: 5px solid var(--peligro); } /* Resalta intentos fallidos con borde rojo. */
-
-    /* Pantallas medianas: todo pasa a una columna. */ /* Media query para <= 900px. */
-    @media (max-width: 900px) { /* Breakpoint de tablet/pantalla mediana. */
-      /* Portada en una sola columna. */ /* Apila columnas en .hero. */
-      .hero { grid-template-columns: 1fr; gap: 28px; } /* Una columna y menor separación. */
-      /* Título más pequeño. */ /* Escala h1 en pantallas medianas. */
-      .hero h1 { font-size: 2.7rem; } /* Reduce tamaño de título principal. */
-      /* Clínicas y pilares en columna. */ /* Apila .sedes y .pilares. */
-      .sedes, .pilares { grid-template-columns: 1fr; } /* Una sola columna. */
-      /* Formulario y resumen apilados. */ /* Apila .dos. */
-      .dos { grid-template-columns: 1fr; } /* Una sola columna. */
-      /* El resumen deja de ser fijo y sube arriba del formulario. */ /* Reordena .resumen arriba. */
-      .resumen { position: static; order: -1; } /* Quita sticky y lo muestra primero. */
-    } /* Cierra @media (max-width: 900px). */
-    /* Celulares: el menú lateral se convierte en barra inferior. */ /* Media query para <= 820px. */
-    @media (max-width: 820px) { /* Breakpoint móvil. */
-      /* Una sola columna. */ /* Layout de una columna en .app. */
-      .app { grid-template-columns: 1fr; } /* Elimina columna lateral fija. */
-      /* Menú fijo abajo, con íconos en fila. */ /* Convierte aside en barra inferior. */
-      aside { /* Barra inferior en móvil. */
-        position: fixed; /* Fija en la ventana. */
-        bottom: 0; /* Pegada abajo. */
-        left: 0; /* Borde izquierdo. */
-        right: 0; /* Borde derecho. */
-        top: auto; /* Libera anclaje superior. */
-        height: auto; /* Altura según contenido. */
-        flex-direction: row; /* Botones en fila horizontal. */
-        padding: 6px; /* Relleno compacto. */
-        z-index: 5; /* Por encima del contenido. */
-      } /* Cierra aside móvil. */
-      /* Se esconden el logo y la zona de usuario en la barra inferior. */ /* Oculta elementos secundarios en móvil. */
-      .logo, .usuario, aside .btn-volver { display: none; } /* Oculta logo, bloque de usuario y botón volver. */
-      /* Botones del menú en fila. */ /* Ajusta nav en barra inferior. */
-      nav { display: flex; width: 100%; gap: 6px; } /* Fila de ancho completo con separación. */
-      /* Ícono sobre el texto, letra más pequeña. */ /* Ajusta botones de nav en móvil. */
-      nav button { /* Botones de navegación móvil. */
-        flex-direction: column; /* Apila ícono arriba y texto abajo. */
-        gap: 2px; /* Separación compacta. */
-        justify-content: center; /* Centra contenido. */
-        font-size: 0.8rem; /* Letra pequeña. */
-        padding: 8px 4px; /* Relleno reducido. */
-        text-align: center; /* Texto centrado. */
-      } /* Cierra nav button móvil. */
-      /* Más espacio abajo para que la barra no tape el contenido. */ /* Compensa altura de barra inferior. */
-      main { padding: 22px 14px 120px; } /* Aumenta padding inferior en main. */
-      /* Campos en una columna. */ /* Apila .fila en móvil. */
-      .fila { grid-template-columns: 1fr; } /* Una columna. */
-      /* Contadores en 3 columnas. */ /* Mantiene 3 columnas en .stats. */
-      .stats { grid-template-columns: repeat(3, 1fr); } /* Tres columnas compactas. */
-      /* Mensaje por encima de la barra inferior. */ /* Sube #toast sobre la barra móvil. */
-      #toast { bottom: 100px; } /* Posición inferior elevada. */
-      /* Historial en una columna. */ /* Apila .evento en móvil. */
-      .evento { grid-template-columns: 1fr; } /* Una columna para fecha y texto. */
-      /* Detalle alineado a la izquierda. */ /* Coloca small en primera columna. */
-      .evento small { grid-column: 1; } /* Reinicia columna en móvil. */
-    } /* Cierra @media (max-width: 820px). */
-    /* Respeta a quien pidió menos movimiento: desactiva transiciones. */ /* Preferencia de movimiento reducido. */
-    @media (prefers-reduced-motion: reduce) { /* Regla de accesibilidad para animaciones. */
-      /* Sin transiciones ni desplazamientos animados. */ /* Desactiva transiciones y scroll suave. */
-      * { transition: none !important; scroll-behavior: auto !important; } /* Anula animaciones/transiciones. */
-    } /* Cierra @media (prefers-reduced-motion: reduce). */
-  </style> <!-- Fin de reglas CSS. -->
-</head> <!-- Fin de head. -->
-<!-- Aquí empieza lo que se ve en pantalla. --> <!-- Cuerpo visible del documento. -->
-<body> <!-- Inicio de body. -->
-  <!-- Sprite de íconos SVG --> <!-- Definición centralizada de símbolos SVG. -->
-  <!-- Almacén de íconos: no se ve, pero otros elementos lo usan con <use href="#nombre">. --> <!-- SVG oculto reutilizable. -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true"> <!-- SVG invisible fuera del flujo normal. -->
-    <defs> <!-- Contenedor de símbolos reutilizables. -->
-      <!-- Ícono + --> <!-- Símbolo de agregar/nueva cita. -->
-      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol> <!-- Trazos en cruz. -->
-      <!-- Ícono calendario. --> <!-- Símbolo de agenda/citas. -->
-      <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></symbol> <!-- Rectángulo de calendario y argollas. -->
-      <!-- Ícono personas. --> <!-- Símbolo de pacientes. -->
-      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-3.6 3.4-5.5 7-5.5s6.3 1.9 7 5.5"/></symbol> <!-- Cabeza y hombros estilizados. -->
-      <!-- Ícono escudo (historial). --> <!-- Símbolo de auditoría/seguridad. -->
-      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></symbol> <!-- Contorno de escudo. -->
-      <!-- Ícono flecha atrás (deshacer). --> <!-- Símbolo para deshacer acciones. -->
-      <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol> <!-- Chevron apuntando a la izquierda. -->
-    </defs> <!-- Fin de defs. -->
-  </svg> <!-- Fin del sprite SVG. -->
-
-  <!-- ===== PORTADA ===== --> <!-- Vista inicial pública/informativa. -->
-  <!-- Pantalla de inicio. Se esconde al abrir el sistema. --> <!-- Contenedor #vista-portada. -->
-  <div id="vista-portada" class="portada"> <!-- Vista de portada visible al inicio. -->
-    <!-- Barra superior. --> <!-- Encabezado de navegación de portada. -->
-    <header class="p-nav"> <!-- Barra superior. -->
-      <!-- Marca MSLS+. --> <!-- Logotipo en portada. -->
-      <span class="marca-mini">MSLS<b>+</b></span> <!-- Nombre de marca con '+' destacado. -->
-      <!-- Abre el sistema directo en la lista de citas. --> <!-- Botón de acceso rápido a citas. -->
-      <button type="button" id="b-nav-citas">Ver citas</button> <!-- Botón para abrir la vista de citas. -->
-    </header> <!-- Fin de cabecera de portada. -->
-
-    <!-- Bloque principal de la portada. --> <!-- Sección hero. -->
-    <section class="hero"> <!-- Contenedor principal del hero. -->
-      <div> <!-- Columna izquierda de texto y llamada a la acción. -->
-        <!-- Saludo. --> <!-- Línea de bienvenida. -->
-        <p class="saludo">Bienvenido a MSLS+</p> <!-- Saludo de marca. -->
-        <!-- Titular. --> <!-- Encabezado principal. -->
-        <h1>Cada cita, en su <em>hora</em>.</h1> <!-- Titular con énfasis en 'hora'. -->
-        <!-- Descripción breve. --> <!-- Propuesta de valor. -->
-        <p class="lead">Agende, cambie o cancele citas en tres clínicas sin cruces ni pérdidas, con pocos pasos y letra clara.</p> <!-- Descripción del servicio. -->
-        <div class="acciones"> <!-- Contenedor de botones de acción. -->
-          <!-- Abre el sistema en 'Nueva cita'. --> <!-- Botón principal de agendar. -->
-          <button type="button" class="btn" id="b-agenda-ahora"> <!-- Botón que abre el sistema en 'nueva'. -->
-            <svg class="ic"><use href="#i-cal"/></svg>Agenda tu cita ahora <!-- Ícono de calendario y etiqueta. -->
-          </button> <!-- Cierra botón principal. -->
-        </div> <!-- Fin de .acciones. -->
-      </div> <!-- Fin de columna izquierda. -->
-
-      <!-- Dibujo de ejemplo, decorativo (aria-hidden: los lectores de pantalla lo ignoran). --> <!-- Vista previa ilustrativa. -->
-      <div class="maqueta" aria-hidden="true"> <!-- Contenedor decorativo de ejemplo. -->
-        <div class="m-card"> <!-- Tarjeta de ejemplo de agenda. -->
-          <div class="m-cab"><b>Agenda de hoy</b><span class="m-ok">Sin cruces</span></div> <!-- Encabezado de ejemplo. -->
-          <!-- Tres citas de ejemplo, una por clínica, con su punto de color. --> <!-- Filas ilustrativas. -->
-          <div class="m-fila"><time>09:00</time><div>Consulta general<small>Clínica Centro</small></div><i class="punto"></i></div> <!-- Cita ejemplo Clínica Centro. -->
-          <div class="m-fila"><time>09:30</time><div>Control pediátrico<small>Clínica Norte</small></div><i class="punto n"></i></div> <!-- Cita ejemplo Clínica Norte. -->
-          <div class="m-fila"><time>10:15</time><div>Chequeo anual<small>Clínica Sur</small></div><i class="punto s"></i></div> <!-- Cita ejemplo Clínica Sur. -->
-        </div> <!-- Fin de .m-card. -->
-        <!-- Aviso de ejemplo 'Cita cancelada · Deshacer'. --> <!-- Etiqueta flotante de ejemplo. -->
-        <div class="m-flota"> <!-- Pill flotante inferior. -->
-          <svg class="ic"><use href="#i-back"/></svg> <!-- Ícono de deshacer. -->
-          <span>Cita cancelada · <u>Deshacer</u></span> <!-- Texto de ejemplo de cancelación reversible. -->
-        </div> <!-- Fin de .m-flota. -->
-      </div> <!-- Fin de .maqueta. -->
-    </section> <!-- Fin de .hero. -->
-
-    <!-- Las tres clínicas. --> <!-- Sección de sedes. -->
-    <section class="sedes" aria-label="Nuestras clínicas"> <!-- Grilla con las sedes de atención. -->
-      <div class="sede"><i class="punto"></i><div><b>Clínica Centro</b><small>Consulta general</small></div></div> <!-- Tarjeta Clínica Centro. -->
-      <div class="sede"><i class="punto n"></i><div><b>Clínica Norte</b><small>Atención familiar</small></div></div> <!-- Tarjeta Clínica Norte. -->
-      <div class="sede"><i class="punto s"></i><div><b>Clínica Sur</b><small>Atención preventiva</small></div></div> <!-- Tarjeta Clínica Sur. -->
-    </section> <!-- Fin de .sedes. -->
-
-    <!-- Visión y a qué se dedica la clínica. --> <!-- Sección de identidad institucional. -->
-    <section class="pilares"> <!-- Dos tarjetas de visión y misión/dedicación. -->
-      <div class="pilar"> <!-- Pilar 1: Visión. -->
-        <h2>Visión</h2> <!-- Título Visión. -->
-        <p>Ser la principal clínica de salud, ofreciendo servicios de calidad y atención personalizada a nuestros pacientes.</p> <!-- Texto de visión. -->
-      </div> <!-- Fin de pilar 1. -->
-      <div class="pilar"> <!-- Pilar 2: A qué nos dedicamos. -->
-        <h2>A qué nos dedicamos</h2> <!-- Título A qué nos dedicamos. -->
-        <p>Ofrecemos atención médica integral, consultas preventivas y acompañamiento cercano para cuidar la salud de nuestros pacientes.</p> <!-- Texto descriptivo. -->
-      </div> <!-- Fin de pilar 2. -->
-    </section> <!-- Fin de .pilares. -->
-  </div> <!-- Fin de #vista-portada. -->
-
-  <!-- ===== SISTEMA ===== --> <!-- Vista principal de operación diaria. -->
-  <!-- Pantalla de trabajo, escondida hasta que se abre. --> <!-- Contenedor #vista-sistema. -->
-  <div id="vista-sistema" class="app oculto"> <!-- Inicia oculta hasta abrir el sistema. -->
-    <!-- Menú lateral. --> <!-- Barra lateral de navegación y sesión. -->
-    <aside> <!-- Contenedor lateral. -->
-      <!-- Nombre del sistema. --> <!-- Logo de la aplicación. -->
-      <div class="logo">Clin<b>Agenda</b></div> <!-- Título ClinAgenda con énfasis. -->
-      <!-- Botones de navegación; data-v indica a qué sección llevan. --> <!-- Menú principal. -->
-      <nav> <!-- Contenedor de vistas internas. -->
-        <!-- Sección Nueva cita (activa al inicio). --> <!-- Botón vista 'nueva'. -->
-        <button type="button" data-v="nueva" class="on"><svg class="ic"><use href="#i-plus"/></svg>Nueva cita</button> <!-- Activo por defecto. -->
-        <!-- Sección Citas. --> <!-- Botón vista 'citas'. -->
-        <button type="button" data-v="citas"><svg class="ic"><use href="#i-cal"/></svg>Citas</button> <!-- Navega a lista de citas. -->
-        <!-- Sección Pacientes. --> <!-- Botón vista 'pacientes'. -->
-        <button type="button" data-v="pacientes"><svg class="ic"><use href="#i-users"/></svg>Pacientes</button> <!-- Navega a pacientes. -->
-        <!-- Historial de cambios: oculto; solo la doctora lo ve (lo muestra aplicarSesion). --> <!-- Botón vista 'auditoria'. -->
-        <button type="button" data-v="auditoria" id="nav-auditoria" class="oculto"><svg class="ic"><use href="#i-shield"/></svg>Historial de cambios</button> <!-- Visible solo para rol doctora. -->
-      </nav> <!-- Fin de nav. -->
-      <!-- Regresa a la portada. --> <!-- Botón para volver a inicio. -->
-      <button type="button" class="btn-volver" id="b-volver-portada">Volver al inicio</button> <!-- Regresa a #vista-portada. -->
-      <!-- Quién ha ingresado. --> <!-- Información de sesión activa. -->
-      <div class="usuario"> <!-- Bloque de usuario en la barra lateral. -->
-        <!-- Se llena con el nombre de la sesión. --> <!-- Muestra nombre del usuario. -->
-        <span class="u-nombre" id="u-nombre"></span> <!-- Texto dinámico de nombre. -->
-        <!-- Se llena con el rol. --> <!-- Muestra rol del usuario. -->
-        <span class="u-rol" id="u-rol"></span> <!-- Texto dinámico de rol. -->
-        <!-- Cierra la sesión y vuelve al ingreso. --> <!-- Botón de cierre de sesión. -->
-        <button type="button" class="btn-volver" id="b-salir">Cerrar sesión</button> <!-- Dispara logout y abre login. -->
-      </div> <!-- Fin de .usuario. -->
-    </aside> <!-- Fin de aside. -->
-
-    <!-- Contenido principal. --> <!-- Área donde se alternan las secciones. -->
-    <main> <!-- Contenedor principal de secciones. -->
-      <!-- Aviso de citas guardadas sin internet; se llena por JavaScript. --> <!-- Banner de cola offline. -->
-      <div id="pendientes" class="aviso-pend oculto" role="status"></div> <!-- Muestra citas pendientes de sincronizar. -->
-
-      <!-- Sección para agendar. --> <!-- Vista de creación de citas. -->
-      <!-- NUEVA CITA --> <!-- Identificador de sección. -->
-      <section id="v-nueva"> <!-- Sección #v-nueva. -->
-        <div class="cab"> <!-- Cabecera de nueva cita. -->
-          <div> <!-- Título y subtítulo. -->
-            <h1>¿Para quién es la cita?</h1> <!-- Pregunta guía de la sección. -->
-            <p>Complete los datos. Si algo no está bien, le diremos qué corregir sin borrar lo que escribió.</p> <!-- Instrucción de formulario. -->
-          </div> <!-- Fin de títulos. -->
-          <!-- Se llena con la fecha de hoy. --> <!-- Badge de fecha actual. -->
-          <span class="fecha-hoy" id="fecha-hoy"></span> <!-- Fecha formateada por JS. -->
-        </div> <!-- Fin de .cab. -->
-
-        <!-- Dos columnas: formulario y resumen. --> <!-- Contenedor de formulario y resumen en vivo. -->
-        <div class="dos"> <!-- Grilla de dos columnas. -->
-          <div class="card"> <!-- Tarjeta del formulario de cita. -->
-            <h3>Datos de la cita</h3> <!-- Subtítulo de tarjeta. -->
-            <label for="buscar">Buscar paciente (escriba parte del nombre)</label> <!-- Etiqueta de filtro de paciente. -->
-            <!-- Búsqueda de paciente por parte del nombre (sin tildes). --> <!-- Input de búsqueda. -->
-            <input id="buscar" placeholder="Ejemplo: maria" autocomplete="off" maxlength="60"> <!-- Filtra opciones de #c-paciente. -->
-
-            <label for="c-paciente">Paciente</label> <!-- Etiqueta de selector de paciente. -->
-            <!-- Lista de pacientes (se llena por JavaScript). --> <!-- Select de pacientes. -->
-            <select id="c-paciente"></select> <!-- Opciones cargadas dinámicamente. -->
-
-            <div class="fila"> <!-- Fila de médico y clínica. -->
-              <div> <!-- Columna médico. -->
-                <label for="c-medico">Médico</label> <!-- Etiqueta de médico. -->
-                <!-- Lista de médicos. --> <!-- Select de médicos. -->
-                <select id="c-medico"></select> <!-- Opciones cargadas dinámicamente. -->
-              </div> <!-- Fin columna médico. -->
-              <div> <!-- Columna clínica. -->
-                <label for="c-clinica">Clínica</label> <!-- Etiqueta de clínica. -->
-                <!-- Lista de clínicas. --> <!-- Select de clínicas. -->
-                <select id="c-clinica"></select> <!-- Opciones cargadas dinámicamente. -->
-                <!-- Muestra el horario de la clínica elegida. --> <!-- Ayuda dinámica de horario. -->
-                <span class="ayuda" id="c-horario"></span> <!-- Texto de horario según clínica. -->
-              </div> <!-- Fin columna clínica. -->
-            </div> <!-- Fin de .fila. -->
-
-            <div class="fila"> <!-- Fila de fecha y hora. -->
-              <div> <!-- Columna fecha. -->
-                <label for="c-fecha">Fecha</label> <!-- Etiqueta de fecha. -->
-                <!-- Selector de fecha. --> <!-- Input tipo date. -->
-                <input type="date" id="c-fecha"> <!-- Selecciona día de la cita. -->
-              </div> <!-- Fin columna fecha. -->
-              <div> <!-- Columna hora. -->
-                <label for="c-hora">Hora</label> <!-- Etiqueta de hora. -->
-                <!-- Selector de hora; step=900 = saltos de 15 minutos. --> <!-- Input tipo time. -->
-                <input type="time" id="c-hora" step="900"> <!-- Selecciona hora en intervalos de 15 min. -->
-              </div> <!-- Fin columna hora. -->
-            </div> <!-- Fin de .fila. -->
-
-            <label for="c-dur">Duración</label> <!-- Etiqueta de duración. -->
-            <!-- Duración; 30 minutos viene elegida. --> <!-- Select de duración en minutos. -->
-            <select id="c-dur"> <!-- Opciones de duración. -->
-              <option value="15">15 minutos</option> <!-- Opción 15 min. -->
-              <option value="30" selected>30 minutos</option> <!-- Opción 30 min por defecto. -->
-              <option value="45">45 minutos</option> <!-- Opción 45 min. -->
-              <option value="60">1 hora</option> <!-- Opción 60 min. -->
-            </select> <!-- Fin de #c-dur. -->
-
-            <!-- Aquí se muestran los errores (role=alert: se leen en voz alta). --> <!-- Contenedor de error de cita. -->
-            <div class="error" id="e-cita" role="alert"></div> <!-- Anuncia errores de validación/servidor. -->
-            <!-- Agendar. --> <!-- Botón de envío de cita. -->
-            <button type="button" class="btn bloque" id="b-cita">Agendar cita</button> <!-- Ejecuta agendamiento. -->
-          </div> <!-- Fin de .card. -->
-
-          <!-- Resumen en vivo (aria-live: se anuncia cuando cambia). --> <!-- Panel lateral de resumen. -->
-          <aside class="card resumen" aria-live="polite"> <!-- Actualiza resumen de forma accesible. -->
-            <h3>Resumen</h3> <!-- Título del resumen. -->
-            <!-- Cuatro datos que se llenan al elegir. --> <!-- Lista descriptiva de selección actual. -->
-            <dl> <!-- Lista dl. -->
-              <dt>Paciente</dt><dd id="r-paciente"></dd> <!-- Paciente seleccionado. -->
-              <dt>Médico</dt><dd id="r-medico"></dd> <!-- Médico seleccionado. -->
-              <dt>Clínica</dt><dd id="r-clinica"></dd> <!-- Clínica seleccionada. -->
-              <dt>Día y hora</dt><dd id="r-cuando"></dd> <!-- Fecha y hora formateadas. -->
-            </dl> <!-- Fin de dl. -->
-          </aside> <!-- Fin de .resumen. -->
-        </div> <!-- Fin de .dos. -->
-      </section> <!-- Fin de #v-nueva. -->
-
-      <!-- Sección de lista de citas. --> <!-- Vista de consulta y gestión de citas. -->
-      <!-- CITAS --> <!-- Identificador de sección. -->
-      <section id="v-citas" class="oculto"> <!-- Sección #v-citas oculta inicialmente. -->
-        <div class="cab"> <!-- Cabecera de citas. -->
-          <div> <!-- Título y descripción. -->
-            <h1>Citas</h1> <!-- Título Citas. -->
-            <p>Las citas canceladas no se borran: puede reactivarlas con “Deshacer”.</p> <!-- Nota sobre cancelación reversible. -->
-          </div> <!-- Fin de textos. -->
-        </div> <!-- Fin de .cab. -->
-        <!-- Tres contadores. --> <!-- Tarjetas de métricas rápidas. -->
-        <div class="stats"> <!-- Grilla de 3 contadores. -->
-          <div class="stat"><b id="s-activas">0</b><span>Citas activas</span></div> <!-- Contador de activas. -->
-          <div class="stat"><b id="s-canceladas">0</b><span>Canceladas</span></div> <!-- Contador de canceladas. -->
-          <div class="stat"><b id="s-hoy">0</b><span>Para hoy</span></div> <!-- Contador de citas activas de hoy. -->
-        </div> <!-- Fin de .stats. -->
-        <label for="f-clinica">Mostrar</label> <!-- Etiqueta de filtro por clínica. -->
-        <!-- Filtro por clínica. --> <!-- Select de filtro. -->
-        <select id="f-clinica"><option value="">Todas las clínicas</option></select> <!-- Filtra citas por clínica. -->
-        <!-- Aquí se dibujan las citas. --> <!-- Contenedor dinámico de citas. -->
-        <div id="lista-citas"></div> <!-- Renderizado por pintarCitas(). -->
-      </section> <!-- Fin de #v-citas. -->
-
-      <!-- Sección del historial (solo doctora). --> <!-- Vista de auditoría. -->
-      <!-- HISTORIAL (solo doctora) --> <!-- Sección restringida a rol doctora. -->
-      <section id="v-auditoria" class="oculto"> <!-- Sección #v-auditoria oculta por defecto. -->
-        <div class="cab"> <!-- Cabecera de historial. -->
-          <div> <!-- Título y descripción. -->
-            <h1>Historial de cambios</h1> <!-- Título de auditoría. -->
-            <p>Quién hizo qué y cuándo. Esta lista no se puede borrar desde el sistema.</p> <!-- Explicación de trazabilidad. -->
-          </div> <!-- Fin de textos. -->
-        </div> <!-- Fin de .cab. -->
-        <!-- Aquí se dibujan los eventos. --> <!-- Contenedor dinámico de eventos. -->
-        <div id="lista-aud"></div> <!-- Renderizado por pintarAuditoria(). -->
-      </section> <!-- Fin de #v-auditoria. -->
-
-      <!-- Sección para registrar pacientes. --> <!-- Vista de registro y listado de pacientes. -->
-      <!-- PACIENTES --> <!-- Identificador de sección. -->
-      <section id="v-pacientes" class="oculto"> <!-- Sección #v-pacientes oculta inicialmente. -->
-        <div class="cab"> <!-- Cabecera de pacientes. -->
-          <div> <!-- Título y descripción. -->
-            <h1>Pacientes</h1> <!-- Título Pacientes. -->
-            <p>Registre a un paciente nuevo. Nombre completo y fecha de nacimiento son obligatorios.</p> <!-- Requisitos mínimos. -->
-          </div> <!-- Fin de textos. -->
-        </div> <!-- Fin de .cab. -->
-
-        <div class="card"> <!-- Tarjeta de formulario de paciente. -->
-          <label for="p-nombre" style="margin-top:0">Nombre completo *</label> <!-- Etiqueta de nombre obligatorio. -->
-          <!-- Nombre completo (obligatorio). --> <!-- Input de nombre. -->
-          <input id="p-nombre" autocomplete="off" maxlength="100" placeholder="Nombre y apellido"> <!-- Campo nombre completo. -->
-
-          <div class="fila"> <!-- Fila de nacimiento y documento. -->
-            <div> <!-- Columna fecha de nacimiento. -->
-              <label for="p-nac">Fecha de nacimiento *</label> <!-- Etiqueta de nacimiento obligatoria. -->
-              <!-- Fecha de nacimiento (obligatoria). --> <!-- Input tipo date. -->
-              <input type="date" id="p-nac"> <!-- Campo fecha de nacimiento. -->
-            </div> <!-- Fin columna nacimiento. -->
-            <div> <!-- Columna tipo de documento. -->
-              <label for="p-tipo">Documento</label> <!-- Etiqueta de tipo de documento. -->
-              <!-- Tipo de documento. --> <!-- Select de tipo de documento. -->
-              <select id="p-tipo"> <!-- Selector de documento. -->
-                <option value="cedula">Cédula</option> <!-- Opción cédula. -->
-                <option value="pasaporte">Pasaporte</option> <!-- Opción pasaporte. -->
-                <option value="ninguno">Todavía no tiene</option> <!-- Opción sin documento. -->
-              </select> <!-- Fin de #p-tipo. -->
-            </div> <!-- Fin columna tipo documento. -->
-          </div> <!-- Fin de .fila. -->
-
-          <!-- Caja del documento; se esconde si no tiene. --> <!-- Contenedor de número de documento. -->
-          <div id="p-doc-box"> <!-- Caja #p-doc-box. -->
-            <label for="p-doc">Número de documento</label> <!-- Etiqueta de número de documento. -->
-            <!-- Número de documento. --> <!-- Input de documento. -->
-            <input id="p-doc" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="10 números"> <!-- Campo número de documento. -->
-            <!-- Ayuda que cambia según el tipo. --> <!-- Texto de ayuda de documento. -->
-            <span class="ayuda" id="p-doc-ayuda">La cédula tiene 10 números, sin espacios.</span> <!-- Instrucción de formato. -->
-          </div> <!-- Fin de #p-doc-box. -->
-
-          <div class="fila"> <!-- Fila de teléfono y correo. -->
-            <div> <!-- Columna teléfono. -->
-              <label for="p-tel">Teléfono (opcional)</label> <!-- Etiqueta de teléfono opcional. -->
-              <!-- Teléfono opcional. --> <!-- Input tipo tel. -->
-              <input id="p-tel" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="0991234567"> <!-- Campo teléfono. -->
-            </div> <!-- Fin columna teléfono. -->
-            <div> <!-- Columna correo. -->
-              <label for="p-cor">Correo (opcional)</label> <!-- Etiqueta de correo opcional. -->
-              <!-- Correo opcional. --> <!-- Input tipo email. -->
-              <input id="p-cor" type="email" inputmode="email" autocomplete="off" maxlength="120" placeholder="nombre@correo.com"> <!-- Campo correo. -->
-            </div> <!-- Fin columna correo. -->
-          </div> <!-- Fin de .fila. -->
-
-          <label for="p-resp">Teléfono de un familiar o tutor (opcional)</label> <!-- Etiqueta de contacto responsable. -->
-          <!-- Teléfono de un familiar o tutor, opcional. --> <!-- Input tipo tel para tutor. -->
-          <input id="p-resp" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="0991234567"> <!-- Campo contacto responsable. -->
-
-          <!-- Errores del formulario. --> <!-- Contenedor de error de paciente. -->
-          <div class="error" id="e-pac" role="alert"></div> <!-- Muestra errores de validación/duplicado. -->
-          <!-- Guardar paciente. --> <!-- Botón principal de guardar paciente. -->
-          <button type="button" class="btn bloque" id="b-pac">Guardar paciente</button> <!-- Envía formulario normal. -->
-          <!-- Aparece solo si el sistema detecta un posible duplicado. --> <!-- Botón de confirmación de homónimo. -->
-          <button type="button" class="btn sec bloque oculto" id="b-pac-igual" style="margin-top:10px">Es otra persona: crear igual</button> <!-- Reenvía con confirmar_homonimo=true. -->
-        </div> <!-- Fin de .card. -->
-
-        <!-- Aquí se dibujan los pacientes. --> <!-- Contenedor dinámico de pacientes. -->
-        <div id="lista-pac"></div> <!-- Renderizado por pintarPacientes(). -->
-      </section> <!-- Fin de #v-pacientes. -->
-    </main> <!-- Fin de main. -->
-  </div> <!-- Fin de #vista-sistema. -->
-
-  <!-- NUEVO: pantalla de ingreso (arranca oculta; la muestra pedirLogin()). --> <!-- Modal de autenticación. -->
-  <!-- INGRESO --> <!-- Bloque HTML de inicio de sesión. -->
-  <!-- Contenedor. data-tema guarda 'oscuro' o 'claro'; role=dialog y aria-modal avisan a lectores de pantalla. --> <!-- Diálogo modal #login. -->
-  <div id="login" class="oculto" data-tema="oscuro" role="dialog" aria-modal="true" aria-labelledby="l-titulo"> <!-- Inicia oculto y con tema oscuro. -->
-    <!-- Botón de cambio de tema. --> <!-- Selector claro/oscuro. -->
-    <button type="button" id="l-tema" aria-label="Cambiar entre modo claro y oscuro"> <!-- Alterna tema del login. -->
-      <!-- Ícono de sol (círculo y rayos). --> <!-- SVG de tema. -->
-      <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg> <!-- Ícono de sol. -->
-      <!-- Texto que alterna entre 'Modo claro' y 'Modo oscuro'. --> <!-- Etiqueta de modo. -->
-      <span id="l-tema-txt">Modo claro</span> <!-- Texto dinámico del botón de tema. -->
-    </button> <!-- Fin de #l-tema. -->
-    <!-- Tarjeta del formulario. --> <!-- Caja central del login. -->
-    <div class="card login-card"> <!-- Tarjeta de acceso. -->
-      <!-- Logo + nombre. --> <!-- Encabezado del modal de login. -->
-      <div class="l-marca"> <!-- Fila de logo y título. -->
-        <!-- Logo: calendario con marca de verificación (decorativo). --> <!-- Isotipo en login. -->
-        <span class="l-logo" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M9 14l2 2 4-4"/></svg></span> <!-- Calendario con check. -->
-        <!-- Nombre del sistema. --> <!-- Título MSLS+. -->
-        <h2 id="l-titulo">MSLS+</h2> <!-- Referenciado por aria-labelledby. -->
-      </div> <!-- Fin de .l-marca. -->
-      <!-- Frase descriptiva. --> <!-- Subtítulo del login. -->
-      <p class="l-lema">La agenda de citas de la clínica.</p> <!-- Descripción breve. -->
-      <!-- Etiqueta enlazada al campo (al tocarla se enfoca). --> <!-- Label de usuario. -->
-      <label for="l-usuario">Usuario</label> <!-- Vinculado a #l-usuario. -->
-      <!-- Usuario escrito a mano. autocomplete=username: el navegador puede recordarlo; autocapitalize=none y spellcheck=false evitan mayúsculas y subrayados en celular. --> <!-- Input de usuario. -->
-      <input id="l-usuario" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="60"> <!-- Campo de nombre de usuario. -->
-      <!-- Etiqueta de la contraseña. --> <!-- Label de PIN/contraseña. -->
-      <label for="l-pin">Contraseña</label> <!-- Vinculado a #l-pin. -->
-      <!-- Contraseña: type=password la oculta; inputmode=numeric muestra teclado numérico (es un PIN); maxlength=12. --> <!-- Input de PIN. -->
-      <input id="l-pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12"> <!-- Campo de contraseña/PIN. -->
-      <!-- Mensaje de error del ingreso. --> <!-- Alerta de error de login. -->
-      <div class="error" id="e-login" role="alert"></div> <!-- Muestra fallos de autenticación o bloqueo. -->
-      <!-- Botón Entrar. --> <!-- Botón de envío de credenciales. -->
-      <button type="button" id="b-login">Entrar</button> <!-- Dispara entrar(). -->
-      <!-- Borrar este bloque antes de usar datos reales. --> <!-- Advertencia para entorno de pruebas. -->
-      <!-- CUENTAS DE PRUEBA: borrar este bloque antes de usar datos reales --> <!-- Sección demo. -->
-      <!-- Contenedor de cuentas. --> <!-- Caja de botones de prueba. -->
-      <div class="l-pruebas"> <!-- Lista de credenciales demo. -->
-        <div>Cuentas de prueba (toque una para llenar):</div> <!-- Instrucción rápida. -->
-        <!-- Al tocarla llena Usuario y Contraseña (valores en data-u y data-p). --> <!-- Cuenta demo 1. -->
-        <button type="button" class="l-cuenta" data-u="rosa" data-p="1234"><span><b>rosa</b> / 1234</span><span>Recepción</span></button> <!-- Autocompleta usuario rosa. -->
-        <!-- Segunda cuenta de recepción. --> <!-- Cuenta demo 2. -->
-        <button type="button" class="l-cuenta" data-u="Recepción Sur" data-p="1234"><span><b>Recepción Sur</b> / 1234</span><span>Recepción</span></button> <!-- Autocompleta Recepción Sur. -->
-        <!-- Cuenta de la doctora. --> <!-- Cuenta demo 3. -->
-        <button type="button" class="l-cuenta" data-u="Dra. Paredes" data-p="1234"><span><b>Dra. Paredes</b> / 1234</span><span>Ve historial y contacto</span></button> <!-- Autocompleta Dra. Paredes. -->
-      </div> <!-- Fin de .l-pruebas. -->
-    </div> <!-- Fin de .login-card. -->
-  </div> <!-- Fin de #login. -->
-
-  <!-- Mensaje temporal. --> <!-- Contenedor de notificaciones toast. -->
-  <!-- TOAST --> <!-- Identificador de toast. -->
-  <!-- Se llena y se muestra por JavaScript. --> <!-- Elemento #toast. -->
-  <div id="toast" class="oculto" role="status" aria-live="polite"></div> <!-- Notificación flotante accesible. -->
-
-  <!-- Aquí empieza el código JavaScript. --> <!-- Lógica de interfaz y comunicación con API. -->
-  <script> <!-- Inicio de script. -->
-    // Atajo: $('#id') busca un elemento de la página. // Función auxiliar de selección DOM.
-    const $ = s => document.querySelector(s); // Devuelve el primer elemento que coincide con el selector CSS.
-    // Convierte < > & " ' en texto seguro para que nada escrito por un usuario se ejecute como código (evita XSS). // Escapado HTML.
-    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ // Convierte valores nulos a cadena vacía y escapa caracteres peligrosos.
-      // Tabla de reemplazos. // Mapa de caracteres HTML a entidades.
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' // Entidades seguras.
-    // Cierra la tabla. // Fin del objeto de reemplazo.
-    }[c])); // Devuelve la entidad correspondiente.
-    // Quita tildes y pasa a minúsculas para buscar pacientes ('maria' encuentra 'María'). // Normalización de búsqueda.
-    const sinTildes = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); // Descompone caracteres acentuados, elimina marcas diacríticas y pasa a minúsculas.
-    // Fecha de hoy AAAA-MM-DD en hora local (corrige la zona horaria). // Fecha local ISO.
-    const hoyLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10); // Ajusta desfase horario antes de tomar YYYY-MM-DD.
-    // Devuelve 'norte' o 'sur' para colorear la tarjeta según la clínica. // Clasificador visual de sede.
-    const claseSede = n => /norte/i.test(n) ? 'norte' : /sur/i.test(n) ? 'sur' : ''; // Retorna clase CSS según el nombre de la clínica.
-
-    // Todos los datos que llegan del servidor. // Estado global de datos.
-    let datos = { clinicas: [], medicos: [], pacientes: [], citas: [], horarios: [] }; // Estructura inicial vacía de colecciones.
-    // Quién ha ingresado (null = nadie). // Estado de sesión activa.
-    let sesion = null; // Almacena objeto { nombre, rol } cuando hay sesión iniciada.
-
-    // Escribe la fecha de hoy en español de Ecuador. // Formatea fecha actual en cabecera.
-    $('#fecha-hoy').textContent = new Date().toLocaleDateString('es-EC', { // Obtiene fecha localizada para es-EC.
-      weekday: 'long', day: 'numeric', month: 'long' // Muestra día de la semana, día numérico y mes.
-    }); // Asigna texto al elemento #fecha-hoy.
-
-    // Cambio entre portada y sistema. // Navegación de alto nivel.
-    /* ---------- portada <-> sistema ---------- */ // Sección de funciones de vista.
-    // Muestra una sección (nueva, citas, pacientes, auditoria) y esconde las demás. // Cambia pestaña activa en el sistema.
-    function mostrarVista(v) { // Recibe nombre de vista 'v'.
-      // Marca como activo el botón de la sección elegida. // Actualiza clase .on en nav.
-      document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.v === v)); // Activa solo el botón correspondiente a v.
-      // Recorre las cuatro secciones... // Itera sobre vistas disponibles.
-      ['nueva', 'citas', 'pacientes', 'auditoria'].forEach(k => { // Nombres de sección.
-        // ...y esconde todas menos la elegida. // Alterna clase .oculto en cada sección #v-<k>.
-        $('#v-' + k).classList.toggle('oculto', k !== v); // Oculta secciones que no coinciden con v.
-      }); // Fin de forEach.
-    } // Fin de mostrarVista.
-    // Pasa de la portada al sistema. // Abre la interfaz principal.
-    function abrirSistema(vista = 'nueva') { // Recibe vista inicial por defecto 'nueva'.
-      // Esconde la portada... // Oculta #vista-portada.
-      $('#vista-portada').classList.add('oculto'); // Agrega clase oculto a la portada.
-      // ...y muestra el sistema. // Muestra #vista-sistema.
-      $('#vista-sistema').classList.remove('oculto'); // Quita clase oculto al sistema.
-      // Abre la sección pedida. // Activa la vista solicitada.
-      mostrarVista(vista); // Muestra la sección indicada.
-      // Sube al inicio de la página. // Desplaza scroll arriba.
-      window.scrollTo({ top: 0 }); // Lleva el scroll a la posición 0.
-      // Pide los datos al servidor; si no hay sesión, el servidor responde 401 y aparece el ingreso. // Carga inicial de datos.
-      cargar(); // Solicita /api/datos.
-    } // Fin de abrirSistema.
-    // Regresa a la portada. // Vuelve a la vista inicial.
-    function volverPortada() { // Oculta sistema y muestra portada.
-      $('#vista-sistema').classList.add('oculto'); // Oculta #vista-sistema.
-      $('#vista-portada').classList.remove('oculto'); // Muestra #vista-portada.
-      window.scrollTo({ top: 0 }); // Sube al inicio de la página.
-    } // Fin de volverPortada.
-    // Botón 'Agenda tu cita ahora'. // Evento clic en #b-agenda-ahora.
-    $('#b-agenda-ahora').onclick = () => abrirSistema('nueva'); // Abre sistema en sección nueva cita.
-    // Botón 'Ver citas'. // Evento clic en #b-nav-citas.
-    $('#b-nav-citas').onclick = () => abrirSistema('citas'); // Abre sistema en sección citas.
-    // Botón 'Volver al inicio'. // Evento clic en #b-volver-portada.
-    $('#b-volver-portada').onclick = volverPortada; // Regresa a la portada.
-
-    // Comunicación con el servidor. // Capa de peticiones HTTP.
-    /* ---------- red / api ---------- */ // Sección de red.
-    // Llama al servidor. Sin 'cuerpo' hace GET; con 'cuerpo' hace POST en JSON. Devuelve la respuesta o lanza un error ya redactado para la persona. // Wrapper de fetch.
-    async function api(ruta, cuerpo) { // Función asíncrona que consulta ruta y envía cuerpo opcional.
-      // r = respuesta, j = su contenido. // Variables para respuesta fetch y JSON parseado.
-      let r, j; // Declara r y j.
-      try { // Intenta ejecutar petición y parseo JSON.
-        // Envía la petición. // Llama a fetch.
-        r = await fetch(ruta, cuerpo === undefined // Espera respuesta HTTP.
-          // Sin cuerpo: petición simple (GET). // Petición GET por defecto.
-          ? {} // Opciones vacías para GET.
-          // Con cuerpo: POST con JSON (el servidor exige este tipo). // Petición POST JSON.
-          : { // Objeto de configuración para POST.
-              method: 'POST', // Método HTTP POST.
-              headers: { 'Content-Type': 'application/json' }, // Encabezado JSON.
-              body: JSON.stringify(cuerpo) // Serializa cuerpo a cadena JSON.
-            }); // Fin de fetch.
-        // Lee el JSON de la respuesta. // Parsea cuerpo de respuesta.
-        j = await r.json(); // Convierte respuesta a objeto JS.
-      } catch (e) { // Captura errores de red o JSON inválido.
-        // Si no hay conexión: error 'offline' con mensaje claro (lo escrito no se pierde). // Error de conectividad.
-        throw { // Lanza objeto de error estandarizado.
-          offline: true, // Indica fallo de red.
-          mensaje: 'No hay conexión con el sistema. Lo que escribió sigue en pantalla: intente de nuevo en un momento.' // Mensaje amigable para el usuario.
-        }; // Fin de throw offline.
-      } // Fin de catch.
-      // Si el servidor respondió con error... // Evalúa códigos HTTP no exitosos.
-      if (!r.ok) { // Si status no está en 200-299.
-        // ...y era por falta de sesión, muestra el ingreso. // Maneja sesión expirada o inexistente.
-        if (r.status === 401 && j.codigo === 'sin_sesion') pedirLogin(); // Abre modal de login si corresponde.
-        // Lanza el error con mensaje, código, campo a marcar y estado HTTP. // Propaga error del backend.
-        throw { // Lanza error estructurado.
-          mensaje: j.error || 'Algo salió mal. Intente de nuevo.', // Mensaje de error.
-          codigo: j.codigo, // Código de error de negocio/auth.
-          campo: j.campo, // Campo asociado para resaltar.
-          estado: r.status // Código HTTP.
-        }; // Fin de throw error HTTP.
-      } // Fin de if (!r.ok).
-      // Todo bien: devuelve los datos. // Retorna respuesta válida.
-      return j; // Devuelve objeto JSON.
-    } // Fin de api.
-
-    // Guarda el temporizador del mensaje flotante. // Referencia de timeout para toast.
-    let tt; // Guarda ID de setTimeout.
-    // Muestra un mensaje temporal; con 'accion' agrega un botón (por ejemplo Deshacer). // Muestra notificación toast.
-    function aviso(texto, accion) { // Recibe texto y objeto opcional { texto, fn }.
-      // Caja del mensaje. // Referencia a #toast.
-      const t = $('#toast'); // Obtiene elemento toast.
-      // Pone el texto (escapado). // Inserta texto seguro en toast.
-      t.innerHTML = `<span>${esc(texto)}</span>`; // Escribe span escapado.
-      // Si hay botón de acción... // Verifica si se pasó acción.
-      if (accion) { // Si existe accion.
-        const b = document.createElement('button'); // Crea botón de acción.
-        b.textContent = accion.texto; // Asigna etiqueta del botón.
-        b.onclick = () => { t.classList.add('oculto'); accion.fn(); }; // Oculta toast y ejecuta callback al pulsar.
-        t.append(b); // Agrega botón al toast.
-      } // Fin de if (accion).
-      // Muestra el mensaje. // Hace visible #toast.
-      t.classList.remove('oculto'); // Quita clase oculto.
-      // Cancela el temporizador anterior. // Evita cierre prematuro de avisos encadenados.
-      clearTimeout(tt); // Limpia timeout previo.
-      // Lo esconde a los 4 segundos (12 si tiene botón). // Programa ocultamiento automático.
-      tt = setTimeout(() => t.classList.add('oculto'), accion ? 12000 : 4000); // Oculta tras 12s con acción o 4s sin acción.
-    } // Fin de aviso.
-
-    // Resaltar el casillero con error. // Utilidades de validación visual.
-    /* ---------- marcar el casillero con error ---------- */ // Sección de marcado de campos.
-    // Relaciona el nombre de campo que manda el servidor con el elemento de la página (pin = campo de contraseña del ingreso). // Mapa campo -> selector.
-    const CAMPOS = { // Diccionario de campos del formulario y login.
-      nombre: '#p-nombre', // Campo nombre de paciente.
-      fecha_nacimiento: '#p-nac', // Campo fecha de nacimiento.
-      documento: '#p-doc', // Campo número de documento.
-      telefono: '#p-tel', // Campo teléfono de paciente.
-      correo: '#p-cor', // Campo correo de paciente.
-      contacto_responsable: '#p-resp', // Campo contacto de tutor/familiar.
-      fecha: '#c-fecha', // Campo fecha de cita.
-      hora: '#c-hora', // Campo hora de cita.
-      pin: '#l-pin' // Campo PIN/contraseña de login.
-    }; // Fin de CAMPOS.
-    // Quita el borde rojo de todos los campos de una sección. // Limpia aria-invalid dentro de un contenedor.
-    const limpiarMarcas = c => document.querySelectorAll(c + ' [aria-invalid]').forEach(el => el.removeAttribute('aria-invalid')); // Elimina atributo aria-invalid.
-    // Pone el borde rojo al campo con problema y lleva el cursor ahí. // Enfoca y marca campo con error.
-    function marcarCampo(campo) { // Recibe nombre lógico del campo.
-      const el = CAMPOS[campo] && $(CAMPOS[campo]); // Busca elemento correspondiente.
-      if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); } // Marca como inválido y enfoca.
-    } // Fin de marcarCampo.
-
-    // Al tocar un botón del menú... // Configura navegación lateral.
-    document.querySelectorAll('nav button').forEach(b => { // Recorre botones del menú.
-      b.onclick = () => { // Asigna manejador de clic.
-        // ...muestra su sección... // Cambia de vista.
-        mostrarVista(b.dataset.v); // Muestra vista data-v.
-        // ...refresca los datos... // Recarga datos desde servidor.
-        cargar(); // Actualiza información en pantalla.
-        // ...y si es el historial, lo dibuja. // Si se selecciona auditoría, carga eventos.
-        if (b.dataset.v === 'auditoria') pintarAuditoria(); // Dibuja historial de cambios.
-      }; // Fin de onclick.
-    }); // Fin de forEach.
-
-    // Cargar y pintar datos. // Sincronización de estado con el backend.
-    /* ---------- datos ---------- */ // Sección de carga de datos.
-    // Pide todos los datos y actualiza la pantalla. // Obtiene datos y renderiza vistas.
-    async function cargar() { // Función asíncrona principal de carga.
-      try { // Intenta consultar /api/datos.
-        // Pide clínicas, médicos, pacientes y citas (según el rol). // Solicita estado al servidor.
-        datos = await api('/api/datos'); // Guarda respuesta en variable global datos.
-      } catch (e) { // Maneja errores al cargar.
-        // Si falta sesión no muestra aviso (ya aparece el ingreso); si es otro error, lo muestra. // Filtra 401.
-        return e.estado === 401 ? null : aviso(e.mensaje); // Muestra toast si no es 401.
-      } // Fin de catch.
-      // Guarda quién ingresó. // Actualiza objeto sesion.
-      sesion = datos.sesion; // Toma información de sesión devuelta por API.
-      // Ajusta menús y nombre según el rol. // Aplica permisos y datos de usuario.
-      aplicarSesion(); // Actualiza menú y etiquetas de usuario.
-      // Llena las listas desplegables. // Puebla selects y límites de fechas.
-      pintarSelects(); // Actualiza opciones de formularios y filtros.
-      // Dibuja la lista de citas. // Renderiza citas y contadores.
-      pintarCitas(); // Actualiza #lista-citas y estadísticas.
-      // Dibuja la lista de pacientes. // Renderiza listado de pacientes.
-      pintarPacientes(); // Actualiza #lista-pac.
-      // Actualiza el resumen. // Refresca tarjeta de resumen de cita.
-      resumen(); // Actualiza valores en #resumen.
-    } // Fin de cargar.
-
-    // Llena las listas de médicos y clínicas. // Pobla selects y restricciones de fecha.
-    function pintarSelects() { // Función de llenado de selects.
-      // Función auxiliar: llena una lista y conserva lo que estaba elegido. // Helper para poblar select preservando valor.
-      const sel = (id, items, ph) => { // Recibe id de select, arreglo de items y placeholder.
-        // Recuerda la selección actual. // Guarda valor previo.
-        const el = $(id), v = el.value; // Obtiene elemento y valor actual.
-        // Opción inicial más una opción por elemento (con el texto escapado). // Construye options seguros.
-        el.innerHTML = `<option value="">${ph}</option>` + items.map(i => `<option value="${i.id}">${esc(i.nombre)}</option>`).join(''); // Inserta opciones en select.
-        // Si la selección anterior sigue existiendo, la vuelve a elegir. // Restaura selección si sigue presente.
-        if ([...el.options].some(o => o.value === v)) el.value = v; // Reasigna valor previo si existe.
-      }; // Fin de sel.
-      // Llena la lista de pacientes aplicando la búsqueda. // Actualiza #c-paciente.
-      filtrarPacientes(); // Filtra y puebla pacientes.
-      // Lista de médicos. // Puebla #c-medico.
-      sel('#c-medico', datos.medicos, 'Elija un médico'); // Carga opciones de médicos.
-      // Lista de clínicas. // Puebla #c-clinica.
-      sel('#c-clinica', datos.clinicas, 'Elija una clínica'); // Carga opciones de clínicas.
-
-      // Filtro de la lista de citas por clínica... // Puebla #f-clinica.
-      const f = $('#f-clinica'), v = f.value; // Obtiene filtro y valor actual.
-      // ...con todas las clínicas... // Agrega opción por clínica.
-      f.innerHTML = '<option value="">Todas las clínicas</option>' + datos.clinicas.map(c => `<option>${esc(c.nombre)}</option>`).join(''); // Llena filtro de clínicas.
-      // ...conservando la elección. // Mantiene selección previa.
-      f.value = v; // Restaura valor de filtro.
-
-      // No se puede elegir una fecha pasada. // Define fecha mínima de cita.
-      $('#c-fecha').min = hoyLocal(); // Bloquea fechas anteriores a hoy.
-      // No se puede nacer en el futuro. // Define fecha máxima de nacimiento.
-      $('#p-nac').max = hoyLocal(); // Bloquea fechas de nacimiento futuras.
-      // Ni hace más de 120 años. // Define fecha mínima de nacimiento.
-      $('#p-nac').min = String(new Date().getFullYear() - 120) + '-01-01'; // Limita antigüedad a 120 años.
-    } // Fin de pintarSelects.
-
-    // Filtra pacientes según lo escrito en la búsqueda. // Filtra y puebla #c-paciente.
-    function filtrarPacientes() { // Función de filtrado de pacientes.
-      // Texto buscado sin tildes ni mayúsculas. // Normaliza término de búsqueda.
-      const q = sinTildes($('#buscar').value.trim()), el = $('#c-paciente'), v = el.value; // Obtiene consulta normalizada, select y valor actual.
-      // Pacientes cuyo nombre contiene ese texto. // Filtra arreglo de pacientes.
-      const lista = datos.pacientes.filter(p => sinTildes(p.nombre).includes(q)); // Coincidencias parciales sin tildes.
-      // Reconstruye la lista con nombre y fecha de nacimiento. // Genera options de pacientes.
-      el.innerHTML = '<option value="">Elija un paciente</option>' + lista.map(p => // Inserta opción vacía y resultados.
-        `<option value="${p.id}">${esc(p.nombre)} · ${esc(p.fecha_nacimiento)}</option>` // Option con nombre y fecha de nacimiento.
-      ).join(''); // Une options.
-      // Si el paciente elegido sigue en la lista, se conserva... // Mantiene selección válida.
-      if (lista.some(p => String(p.id) === v)) el.value = v; // Conserva paciente si sigue en lista filtrada.
-      // ...y si solo queda uno, se elige solo. // Autoselecciona si hay único resultado.
-      else if (lista.length === 1) el.value = lista[0].id; // Selecciona el único paciente restante.
-      // Actualiza el resumen. // Refresca resumen en vivo.
-      resumen(); // Actualiza panel de resumen.
-    } // Fin de filtrarPacientes.
-    // Filtra mientras se escribe. // Evento input en #buscar.
-    $('#buscar').oninput = filtrarPacientes; // Ejecuta filtrado en cada pulsación.
-
-    // Resumen en vivo de la cita. // Actualización dinámica de datos de cita.
-    /* ---------- resumen en vivo de la cita ---------- */ // Sección de resumen.
-    // Muestra lo elegido en la tarjeta de resumen. // Sincroniza panel lateral con formulario.
-    function resumen() { // Actualiza campos de #resumen.
-      // Texto de la opción elegida en una lista (vacío si no hay). // Helper para leer texto de select.
-      const txt = id => { const o = $(id).selectedOptions[0]; return o && o.value ? o.textContent : ''; }; // Devuelve texto si hay valor seleccionado.
-      // Escribe un valor o 'Sin elegir' (en gris). // Helper para escribir dd.
-      const poner = (id, v) => { const e = $(id); e.textContent = v || 'Sin elegir'; e.classList.toggle('vacio-r', !v); }; // Actualiza texto y estilo vacío.
-      // Paciente. // Actualiza fila Paciente.
-      poner('#r-paciente', txt('#c-paciente')); // Muestra paciente elegido.
-      // Médico. // Actualiza fila Médico.
-      poner('#r-medico', txt('#c-medico')); // Muestra médico elegido.
-      // Clínica. // Actualiza fila Clínica.
-      poner('#r-clinica', txt('#c-clinica')); // Muestra clínica elegida.
-      // Muestra el horario de la clínica elegida. // Actualiza texto de ayuda de horario.
-      $('#c-horario').textContent = textoHorario($('#c-clinica').value); // Pone horario formateado de la clínica.
-      // Fecha y hora escritas. // Lee fecha y hora de inputs.
-      const f = $('#c-fecha').value, h = $('#c-hora').value; // Valores de #c-fecha y #c-hora.
-      // Si hay fecha y hora, las muestra en español ('lunes 23 de noviembre, 09:00'). // Formatea fecha/hora en resumen.
-      poner('#r-cuando', f && h // Si ambos están presentes.
-        ? new Date(f + 'T' + h).toLocaleString('es-EC', { // Formatea fecha y hora local en es-EC.
-            weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' // Opciones de formato legible.
-          }) // Fin toLocaleString.
-        : ''); // Si falta fecha u hora, queda vacío ('Sin elegir').
-    } // Fin de resumen.
-    // El resumen se actualiza al cambiar cualquiera de estos campos. // Escucha cambios en formulario de cita.
-    ['#c-paciente', '#c-medico', '#c-clinica', '#c-fecha', '#c-hora'].forEach(s => $(s).addEventListener('input', resumen)); // Vincula evento input a resumen().
-
-    // Botón Agendar. // Envío de nueva cita.
-    /* ---------- agendar ---------- */ // Sección de agendamiento.
-    // Texto de la opción elegida. // Helper para obtener etiqueta de select.
-    const textoSel = id => { const o = $(id).selectedOptions[0]; return o && o.value ? o.textContent : ''; }; // Retorna texto de opción seleccionada o ''.
-    // Al pulsar 'Agendar cita': // Manejador de clic en #b-cita.
-    $('#b-cita').onclick = async () => { // Envía datos de cita al servidor.
-      // Botón y caja de error. // Referencias de control y alerta.
-      const b = $('#b-cita'), e = $('#e-cita'); // Obtiene botón y contenedor de error.
-      // Borra el error anterior. // Limpia mensaje previo.
-      e.textContent = ''; // Vacía #e-cita.
-      // Quita marcas rojas anteriores. // Limpia aria-invalid en #v-nueva.
-      limpiarMarcas('#v-nueva'); // Quita marcas de error previas.
-      // Desactiva el botón para evitar doble clic. // Bloquea botón durante envío.
-      b.disabled = true; // Deshabilita #b-cita.
-
-      // 'clave' identifica este intento: si hay que reenviarlo por falta de internet, el servidor no duplica la cita. // Comentario de idempotencia.
-      // Datos a enviar. 'clave' único identifica el intento: si hay que reenviarlo por falta de internet, el servidor no duplica la cita. // Payload de cita.
-      const cuerpo = { // Objeto con datos del formulario.
-        paciente_id: $('#c-paciente').value, // ID del paciente.
-        medico_id: $('#c-medico').value, // ID del médico.
-        clinica_id: $('#c-clinica').value, // ID de la clínica.
-        fecha: $('#c-fecha').value, // Fecha YYYY-MM-DD.
-        hora: $('#c-hora').value, // Hora HH:MM.
-        duracion: $('#c-dur').value, // Duración en minutos.
-        clave: nuevaClave() // Clave única anti-duplicados.
-      }; // Fin de cuerpo.
-
-      // Intenta agendar. // Ejecuta petición POST /api/citas.
-      try { // Intenta guardar en servidor.
-        // Envía la cita al servidor. // Llama a api('/api/citas', cuerpo).
-        await api('/api/citas', cuerpo); // Espera confirmación del backend.
-        // Confirma. // Muestra notificación de éxito.
-        aviso('✔ Cita agendada'); // Muestra toast de confirmación.
-        // Limpia la hora para la siguiente. // Reinicia campo de hora.
-        $('#c-hora').value = ''; // Vacía #c-hora.
-        // Refresca los datos. // Recarga citas y estado desde servidor.
-        await cargar(); // Actualiza interfaz.
-      // Si falla... // Captura error de red o negocio.
-      } catch (x) { // Maneja excepción x.
-        // Si fue por falta de internet y están todos los datos... // Evalúa guardado offline.
-        if (x.offline && cuerpo.paciente_id && cuerpo.medico_id && cuerpo.clinica_id && cuerpo.fecha && cuerpo.hora) { // Si está offline y los campos obligatorios están completos.
-          // ...lee las citas pendientes guardadas en este equipo... // Recupera cola local.
-          const l = leerPend(); // Lee pendientes de localStorage.
-          // ...agrega esta con su clave... // Añade nueva cita pendiente.
-          l.push({ // Agrega registro a lista local.
-            clave: cuerpo.clave, // Clave de idempotencia.
-            cuerpo, // Datos originales para reenviar.
-            texto: `${textoSel('#c-paciente')} · ${cuerpo.fecha} ${cuerpo.hora} · ${textoSel('#c-clinica')}` // Resumen legible para el usuario.
-          }); // Fin de push.
-          // ...y la guarda; si se pudo, avisa que queda SIN confirmar... // Persiste en localStorage.
-          if (guardarPend(l)) { // Si se guardó correctamente en localStorage.
-            // Mensaje claro: no está confirmada. // Informa estado no confirmado.
-            aviso('Sin internet: la cita quedó guardada en este equipo, pero NO está confirmada todavía.'); // Muestra aviso offline.
-            $('#c-hora').value = ''; // Limpia hora tras guardar pendiente.
-            // Muestra el aviso amarillo de pendientes. // Actualiza banner #pendientes.
-            pintarPend(); // Renderiza lista de pendientes.
-          // Si no se pudo guardar, pide anotarla en papel. // Plan de contingencia si falla localStorage.
-          } else { // Si guardarPend devuelve false.
-            // Mensaje de último recurso. // Avisa fallo de almacenamiento local.
-            e.textContent = x.mensaje + ' Además no se pudo guardar en este equipo: anote la cita en papel.'; // Muestra mensaje de respaldo.
-          } // Fin if/else guardarPend.
-        } else { // Si no es caso offline guardable.
-          // Cualquier otro error: muestra el mensaje... // Escribe error en #e-cita.
-          e.textContent = x.mensaje; // Muestra texto de error.
-          // ...y marca el casillero con problema. // Resalta campo correspondiente.
-          marcarCampo(x.campo); // Enfoca y marca campo con error.
-        } // Fin if/else offline.
-      } // Fin catch.
-      // Reactiva el botón. // Habilita nuevamente #b-cita.
-      b.disabled = false; // Quita estado disabled.
-    }; // Fin de onclick #b-cita.
-
-    // Dibujar las citas. // Renderizado de agenda y estadísticas.
-    /* ---------- lista de citas ---------- */ // Sección de listado de citas.
-    // Dibuja la lista y los contadores. // Actualiza métricas y tarjetas de citas.
-    function pintarCitas() { // Renderiza sección #v-citas.
-      // Clínica elegida en el filtro y contenedor. // Obtiene filtro y contenedor destino.
-      const filtro = $('#f-clinica').value, cont = $('#lista-citas'); // Lee clínica seleccionada y referencia a #lista-citas.
-      // Citas de esa clínica (o todas). // Filtra citas según selector.
-      const citas = datos.citas.filter(c => !filtro || c.clinica === filtro); // Aplica filtro por nombre de clínica si existe.
-      // Contador de activas. // Actualiza #s-activas.
-      $('#s-activas').textContent = citas.filter(c => c.estado === 'activa').length; // Cuenta citas activas.
-      // Contador de canceladas. // Actualiza #s-canceladas.
-      $('#s-canceladas').textContent = citas.filter(c => c.estado === 'cancelada').length; // Cuenta citas canceladas.
-      // Contador de las de hoy. // Actualiza #s-hoy.
-      $('#s-hoy').textContent = citas.filter(c => c.estado === 'activa' && c.inicio.slice(0, 10) === hoyLocal()).length; // Cuenta citas activas de la fecha local de hoy.
-
-      // Sin citas: mensaje y termina. // Maneja lista vacía.
-      if (!citas.length) { // Si no hay citas filtradas.
-        cont.innerHTML = '<div class="vacio">No hay citas próximas.</div>'; // Muestra mensaje vacío.
-        return; // Sale de pintarCitas.
-      } // Fin if (!citas.length).
-
-      // Día actual del recorrido y el HTML acumulado. // Variables de agrupación diaria.
-      let dia = '', html = ''; // Rastrea último día renderizado y acumula marcado HTML.
-      // Recorre cada cita. // Itera sobre citas filtradas.
-      for (const c of citas) { // Recorre cada objeto cita.
-        // Fecha de la cita y clave del día. // Extrae fecha YYYY-MM-DD.
-        const d = new Date(c.inicio), clave = c.inicio.slice(0, 10); // Crea Date y toma prefijo de fecha.
-        // Si cambió el día... // Inserta encabezado de día cuando cambia.
-        if (clave !== dia) { // Si el día es distinto al anterior.
-          dia = clave; // Actualiza día activo.
-          // ...agrega un encabezado con el día. // Añade bloque .dia.
-          html += `<div class="dia">${esc(d.toLocaleDateString('es-EC', { weekday: 'long', day: 'numeric', month: 'long' }))}</div>`; // Agrega título de fecha formateada.
-        } // Fin if (clave !== dia).
-        // Hora HH:MM y si está cancelada. // Extrae hora y estado de cancelación.
-        const hora = c.inicio.slice(11, 16), cancel = c.estado === 'cancelada'; // Obtiene HH:MM y booleano cancel.
-        // Arma la tarjeta: hora, paciente, médico y clínica, con botón Cancelar o Deshacer. // Construye HTML de tarjeta .cita.
-        html += ` // Concatena tarjeta de cita.
-          <div class="card cita ${claseSede(c.clinica)} ${cancel ? 'cancelada' : ''}"> <!-- Tarjeta con clase de sede y estado cancelada. -->
-            <div class="hora">${hora}</div> <!-- Hora de inicio. -->
-            <div class="info"> <!-- Datos de paciente, médico y clínica. -->
-              <b>${esc(c.paciente)}</b>${cancel ? '<span class="chip">Cancelada</span>' : ''} <!-- Nombre de paciente y chip si está cancelada. -->
-              <small>${esc(c.medico)} · ${esc(c.clinica)}</small> <!-- Médico y clínica. -->
-            </div> <!-- Fin de .info. -->
-            ${cancel // Alterna botón según estado de la cita.
-              ? `<button type="button" class="chico ok" data-a="deshacer" data-id="${c.id}">Deshacer</button>` // Botón para reactivar cita cancelada.
-              : `<button type="button" class="chico peligro" data-a="cancelar" data-id="${c.id}">Cancelar cita</button>`} <!-- Botón para cancelar cita activa. -->
-          </div>`; // Cierra tarjeta .cita.
-      } // Fin for.
-      // Pinta todo de una vez. // Inserta HTML generado en el DOM.
-      cont.innerHTML = html; // Actualiza #lista-citas.
-    } // Fin de pintarCitas.
-
-    // Al cambiar el filtro, se vuelve a dibujar. // Evento change en #f-clinica.
-    $('#f-clinica').onchange = pintarCitas; // Redibuja lista de citas al cambiar clínica.
-    // Un solo escuchador para todos los botones de la lista. // Delegación de eventos en #lista-citas.
-    $('#lista-citas').onclick = async ev => { // Maneja clics en botones cancelar/deshacer.
-      // Averigua si se tocó un botón de acción. // Busca botón con data-a.
-      const b = ev.target.closest('button[data-a]'); // Encuentra botón ancestro o el mismo elemento.
-      // Si no, no hace nada. // Ignora clics fuera de botones de acción.
-      if (!b) return; // Sale si no hay botón.
-      // Número de la cita y acción (cancelar o deshacer). // Lee atributos data-id y data-a.
-      const id = b.dataset.id, accion = b.dataset.a; // Extrae ID de cita y acción.
-      // Antes de cancelar pregunta; si dice que no, se detiene. // Confirma antes de cancelar.
-      if (accion === 'cancelar' && !confirm('¿Seguro que desea cancelar esta cita?\n(Podrá deshacerlo después.)')) return; // Detiene si el usuario cancela el diálogo.
-      // Intenta la acción. // Llama al endpoint correspondiente.
-      try { // Intenta ejecutar acción en servidor.
-        // Llama al servidor. // Envía POST /api/citas/<id>/<accion>.
-        const r = await api(`/api/citas/${id}/${accion}`, {}); // Espera respuesta del servidor.
-        // Muestra el resultado; al cancelar ofrece el botón Deshacer por 12 segundos. // Muestra aviso y opción rápida de deshacer.
-        aviso(r.mensaje, accion === 'cancelar' ? { texto: 'Deshacer', fn: () => accionCita(id, 'deshacer') } : null); // Muestra toast.
-      // Si falla... // Captura error de petición o negocio.
-      } catch (x) { // Maneja error x.
-        // ...muestra el motivo. // Informa error en toast.
-        aviso(x.mensaje); // Muestra mensaje de error.
-      } // Fin catch.
-      // Refresca la lista. // Recarga datos desde el servidor.
-      cargar(); // Actualiza vista.
-    }; // Fin onclick #lista-citas.
-
-    // Ejecuta cancelar o deshacer desde el botón del mensaje. // Helper para acción desde toast.
-    async function accionCita(id, accion) { // Ejecuta cancelar o deshacer para id dado.
-      // Intenta. // Envía petición al API.
-      try { // Intenta llamar al servidor.
-        // Llama y muestra el resultado. // Ejecuta endpoint y muestra mensaje.
-        aviso((await api(`/api/citas/${id}/${accion}`, {})).mensaje); // Muestra respuesta en toast.
-      // Error... // Captura fallo.
-      } catch (x) { // Maneja error x.
-        // ...se muestra. // Informa motivo en toast.
-        aviso(x.mensaje); // Muestra mensaje de error.
-      } // Fin catch.
-      // Refresca. // Actualiza datos en pantalla.
-      cargar(); // Recarga estado desde servidor.
-    } // Fin accionCita.
-
-    // Formulario de pacientes. // Gestión y registro de pacientes.
-    /* ---------- pacientes ---------- */ // Sección de pacientes.
-    // Adapta el campo de documento al tipo elegido. // Ajusta validaciones visuales según tipo_doc.
-    function ajustarDocumento() { // Configura #p-doc y #p-doc-ayuda.
-      // Tipo, campo y ayuda. // Obtiene referencias de elementos de documento.
-      const tipo = $('#p-tipo').value, doc = $('#p-doc'), ayuda = $('#p-doc-ayuda'); // Lee tipo seleccionado, input y span de ayuda.
-      // Si es 'ninguno', esconde el campo. // Oculta #p-doc-box si no tiene documento.
-      $('#p-doc-box').classList.toggle('oculto', tipo === 'ninguno'); // Alterna clase oculto.
-      // Quita el error marcado. // Limpia aria-invalid en #p-doc.
-      doc.removeAttribute('aria-invalid'); // Quita marca roja previa.
-      // Cédula: teclado numérico, máximo 10, ayuda y solo números. // Configura modo cédula.
-      if (tipo === 'cedula') { // Si tipo es 'cedula'.
-        doc.inputMode = 'numeric'; // Teclado numérico en móviles.
-        doc.maxLength = 10; // Máximo 10 caracteres.
-        doc.placeholder = '10 números'; // Placeholder orientativo.
-        ayuda.textContent = 'La cédula tiene 10 números, sin espacios.'; // Texto de ayuda para cédula.
-        doc.value = doc.value.replace(/\D/g, '').slice(0, 10); // Limpia caracteres no numéricos y recorta a 10.
-      // Pasaporte: letras y números, hasta 15. // Configura modo pasaporte.
-      } else if (tipo === 'pasaporte') { // Si tipo es 'pasaporte'.
-        doc.inputMode = 'text'; // Teclado alfanumérico.
-        doc.maxLength = 15; // Máximo 15 caracteres.
-        doc.placeholder = 'Letras y números'; // Placeholder orientativo.
-        ayuda.textContent = 'El pasaporte tiene entre 5 y 15 letras o números, sin espacios.'; // Texto de ayuda para pasaporte.
-        doc.value = doc.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 15); // Deja solo caracteres alfanuméricos y recorta a 15.
-      } // Fin if/else tipo.
-    } // Fin ajustarDocumento.
-    // Al cambiar el tipo, se ajusta el campo. // Evento change en #p-tipo.
-    $('#p-tipo').onchange = ajustarDocumento; // Aplica reglas de tipo de documento al cambiar.
-    // Al escribir, quita lo que no corresponda (letras en cédula, símbolos en pasaporte). // Sanitización en vivo de #p-doc.
-    $('#p-doc').oninput = () => { // Filtra caracteres al escribir en #p-doc.
-      const d = $('#p-doc'); // Referencia a input de documento.
-      d.value = $('#p-tipo').value === 'cedula' // Según tipo seleccionado.
-        ? d.value.replace(/\D/g, '') // Solo dígitos para cédula.
-        : d.value.replace(/[^A-Za-z0-9]/g, ''); // Solo letras y números para pasaporte.
-    }; // Fin oninput #p-doc.
-
-    // Valida lo mínimo y envía; 'confirmar' = true si es un homónimo confirmado. // Guarda paciente en API.
-    async function guardarPaciente(confirmar) { // Recibe booleano confirmar para homónimos.
-      // Caja de error. // Referencia a #e-pac.
-      const e = $('#e-pac'); // Obtiene contenedor de error.
-      // Limpia. // Borra mensaje anterior.
-      e.textContent = ''; // Vacía #e-pac.
-      // Quita marcas. // Limpia aria-invalid en #v-pacientes.
-      limpiarMarcas('#v-pacientes'); // Quita marcas rojas previas.
-      // Esconde el botón 'crear igual'. // Oculta botón de homónimo antes de intentar.
-      $('#b-pac-igual').classList.add('oculto'); // Oculta #b-pac-igual.
-
-      // Nombre obligatorio... // Valida que #p-nombre no esté vacío.
-      if (!$('#p-nombre').value.trim()) { // Si el nombre sin espacios es vacío.
-        // ...mensaje... // Escribe mensaje de error.
-        e.textContent = 'Escriba el nombre completo del paciente.'; // Informa que falta nombre.
-        // ...y marca el casillero. // Resalta y enfoca nombre.
-        return marcarCampo('nombre'); // Marca campo 'nombre' y detiene envío.
-      } // Fin validación nombre.
-      // Fecha de nacimiento obligatoria... // Valida que #p-nac tenga valor.
-      if (!$('#p-nac').value) { // Si no se eligió fecha de nacimiento.
-        // ...mensaje... // Escribe mensaje de error.
-        e.textContent = 'Elija la fecha de nacimiento.'; // Informa que falta fecha de nacimiento.
-        // ...y marca el casillero. // Resalta y enfoca fecha_nacimiento.
-        return marcarCampo('fecha_nacimiento'); // Marca campo 'fecha_nacimiento' y detiene envío.
-      } // Fin validación fecha de nacimiento.
-
-      // Desactiva el botón mientras se envía. // Bloquea #b-pac durante petición.
-      $('#b-pac').disabled = true; // Deshabilita botón guardar.
-      // Intenta guardar. // Llama a POST /api/pacientes.
-      try { // Intenta registrar paciente en backend.
-        // Envía todos los datos; el servidor hace la validación completa. // Arma y envía payload.
-        await api('/api/pacientes', { // Envía datos del formulario.
-          nombre: $('#p-nombre').value, // Nombre ingresado.
-          fecha_nacimiento: $('#p-nac').value, // Fecha de nacimiento.
-          tipo_doc: $('#p-tipo').value, // Tipo de documento.
-          documento: $('#p-doc').value, // Número de documento.
-          telefono: $('#p-tel').value, // Teléfono opcional.
-          correo: $('#p-cor').value, // Correo opcional.
-          contacto_responsable: $('#p-resp').value, // Teléfono familiar/tutor.
-          confirmar_homonimo: confirmar // Indica si se confirmó crear pese a homónimo.
-        }); // Fin de api('/api/pacientes').
-        // Si se guardó, vacía el formulario. // Limpia campos del formulario de paciente.
-        ['nombre', 'nac', 'doc', 'tel', 'cor', 'resp'].forEach(k => { $('#p-' + k).value = ''; }); // Vacía cada campo.
-        // Confirma. // Muestra notificación de éxito.
-        aviso('✔ Paciente registrado'); // Muestra toast de confirmación.
-        // Refresca. // Actualiza lista de pacientes y selects.
-        await cargar(); // Recarga datos desde servidor.
-      // Si falla, NO se borra lo escrito: // Conserva datos ingresados ante error.
-      } catch (x) { // Captura error x.
-        // muestra el motivo... // Escribe error en #e-pac.
-        e.textContent = x.mensaje; // Muestra mensaje devuelto por el servidor.
-        // ...marca el casillero... // Resalta campo indicado.
-        marcarCampo(x.campo); // Marca y enfoca campo con problema.
-        // ...y si es un posible duplicado, ofrece 'Es otra persona: crear igual'. // Muestra botón para confirmar homónimo.
-        if (x.codigo === 'homonimo') $('#b-pac-igual').classList.remove('oculto'); // Hace visible #b-pac-igual.
-      } // Fin catch.
-      // Reactiva el botón. // Habilita #b-pac.
-      $('#b-pac').disabled = false; // Quita estado disabled.
-    } // Fin guardarPaciente.
-
-    // Guardar normal. // Clic en #b-pac.
-    $('#b-pac').onclick = () => guardarPaciente(false); // Guarda paciente sin confirmar homónimo.
-    // Guardar confirmando que es otra persona. // Clic en #b-pac-igual.
-    $('#b-pac-igual').onclick = () => guardarPaciente(true); // Guarda paciente confirmando que es otra persona.
-
-    // Dibuja la lista de pacientes. // Renderiza #lista-pac.
-    function pintarPacientes() { // Actualiza tarjetas de pacientes registrados.
-      // Iniciales (hasta dos) para el avatar. // Helper de iniciales.
-      const ini = n => n.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase(); // Toma primeras letras de hasta dos palabras.
-      // Dibuja cada paciente con avatar, fecha, documento y, si el rol lo permite, teléfono y correo. // Genera HTML de pacientes.
-      $('#lista-pac').innerHTML = '<div class="dia">Pacientes registrados</div>' + (datos.pacientes.map(p => ` // Encabezado y tarjetas por paciente.
-        <div class="card pac"> <!-- Tarjeta de paciente. -->
-          <span class="avatar" aria-hidden="true">${esc(ini(p.nombre))}</span> <!-- Avatar con iniciales. -->
-          <div> <!-- Datos textuales del paciente. -->
-            <b>${esc(p.nombre)}</b> <!-- Nombre del paciente. -->
-            <small> <!-- Detalles secundarios. -->
-              Nació el ${esc(p.fecha_nacimiento)} · <!-- Fecha de nacimiento. -->
-              ${p.tipo_doc === 'ninguno' ? 'sin documento' : esc(p.tipo_doc) + ' ' + esc(p.documento)} <!-- Documento o 'sin documento'. -->
-              ${p.telefono ? ' · Tel. ' + esc(p.telefono) : ''} <!-- Teléfono si está disponible para el rol. -->
-              ${p.correo ? ' · ' + esc(p.correo) : ''} <!-- Correo si está disponible para el rol. -->
-            </small> <!-- Fin de small. -->
-          </div> <!-- Fin de bloque de texto. -->
-        </div> <!-- Fin de .pac. -->
-      `).join('') || '<div class="vacio">Aún no hay pacientes.</div>'); // Mensaje si no hay pacientes registrados.
-    } // Fin pintarPacientes.
-
-    // Mostrar horario de la clínica. // Formateo de franjas horarias por sede.
-    /* ---------- horario de cada clínica ---------- */ // Sección de horarios.
-    // Nombres cortos de los días (0 = lunes). // Etiquetas de días de la semana.
-    const DIA_CORTO = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']; // Array de 7 días empezando en lunes.
-    // Construye texto como 'Atiende: Lun a Vie 08:00–17:00 · Sáb 08:00–12:00'. // Resume horarios agrupando días contiguos.
-    function textoHorario(id) { // Recibe ID de clínica.
-      // Horarios de esa clínica. // Filtra horarios por clinica_id.
-      const h = (datos.horarios || []).filter(x => String(x.clinica_id) === String(id)); // Obtiene filas de horario de la clínica.
-      // Sin horarios: no muestra nada. // Retorna vacío si no hay registros.
-      if (!h.length) return ''; // Sin horarios configurados.
-      // Grupos de días consecutivos con el mismo horario. // Acumula rangos de días.
-      const g = []; // Lista de grupos de días.
-      // Recorre los días. // Itera sobre horarios de la clínica.
-      for (const x of h) { // Recorre cada regla de horario.
-        // Horario como texto y último grupo. // Clave de rango horario y último grupo agregado.
-        const k = x.abre + '–' + x.cierra, u = g[g.length - 1]; // Formato 'HH:MM–HH:MM' y último elemento de g.
-        // Si es consecutivo y con el mismo horario, extiende el grupo... // Agrupa días consecutivos iguales.
-        if (u && u.k === k && u.fin === x.dia_semana - 1) u.fin = x.dia_semana; // Extiende fin del grupo actual.
-        // ...si no, abre uno nuevo. // Crea nuevo grupo.
-        else g.push({ k, ini: x.dia_semana, fin: x.dia_semana }); // Agrega nuevo grupo con inicio y fin iguales.
-      } // Fin for.
-      // Une los grupos con ' · '. // Formatea texto final de horarios.
-      return 'Atiende: ' + g.map(x => // Prefijo 'Atiende: '.
-        (x.ini === x.fin ? DIA_CORTO[x.ini] : DIA_CORTO[x.ini] + ' a ' + DIA_CORTO[x.fin]) + ' ' + x.k // Día único o rango 'X a Y' más horario.
-      ).join(' · '); // Une grupos con separador ' · '.
-    } // Fin textoHorario.
-
-    // NUEVO / MODIFICADO: pantalla de ingreso. // Lógica de tema y sesión de login.
-    /* ---------- ingreso ---------- */ // Sección de autenticación.
-    // Cambia entre tema oscuro y claro. // Aplica tema visual al modal #login.
-    function aplicarTema(t) { // Recibe 'oscuro' o 'claro'.
-      // Cambia data-tema y el CSS hace el resto. // Actualiza atributo data-tema.
-      $('#login').dataset.tema = t; // Establece tema en #login.
-      // El botón ofrece el tema contrario. // Actualiza texto del botón #l-tema-txt.
-      $('#l-tema-txt').textContent = t === 'oscuro' ? 'Modo claro' : 'Modo oscuro'; // Muestra la opción opuesta al tema actual.
-      // Recuerda la elección; el try evita fallos si el navegador bloquea el almacenamiento. // Persiste preferencia en localStorage.
-      try { localStorage.setItem('tema-ingreso', t); } catch (e) {} // Guarda tema ignorando errores de almacenamiento.
-    } // Fin aplicarTema.
-    // Al pulsar el botón alterna el tema. // Evento clic en #l-tema.
-    $('#l-tema').onclick = () => aplicarTema($('#login').dataset.tema === 'oscuro' ? 'claro' : 'oscuro'); // Alterna entre claro y oscuro.
-    // Al abrir la página, restaura el tema guardado (oscuro por defecto). // Inicializa tema al cargar script.
-    try { aplicarTema(localStorage.getItem('tema-ingreso') === 'claro' ? 'claro' : 'oscuro'); } catch (e) {} // Lee preferencia guardada o usa oscuro.
-
-    // Al tocar una cuenta de prueba... // Autocompleta credenciales demo.
-    document.querySelectorAll('.l-cuenta').forEach(b => b.onclick = () => { // Asigna clic a cada botón .l-cuenta.
-      // ...copia el usuario... // Rellena #l-usuario.
-      $('#l-usuario').value = b.dataset.u; // Asigna usuario desde data-u.
-      // ...copia la contraseña... // Rellena #l-pin.
-      $('#l-pin').value = b.dataset.p; // Asigna PIN desde data-p.
-      // ...y deja el cursor listo para Enter. // Enfoca campo de PIN.
-      $('#l-pin').focus(); // Lleva el foco a #l-pin.
-    }); // Fin forEach .l-cuenta.
-
-    // Muestra la pantalla de ingreso (se llama al recibir un 401 o al cerrar sesión). // Abre modal de login y limpia sesión.
-    function pedirLogin() { // Prepara y muestra #login.
-      // Olvida la sesión. // Limpia variable sesion.
-      sesion = null; // Reinicia sesión actual.
-      // Esconde nombre y menús especiales. // Actualiza UI sin sesión.
-      aplicarSesion(); // Limpia datos de usuario y oculta auditoría.
-      // Borra errores viejos. // Limpia #e-login.
-      $('#e-login').textContent = ''; // Borra mensajes de error previos.
-      // Vacía usuario. // Limpia #l-usuario.
-      $('#l-usuario').value = ''; // Borra campo de usuario.
-      // Vacía contraseña. // Limpia #l-pin.
-      $('#l-pin').value = ''; // Borra campo de contraseña.
-      // Muestra el ingreso. // Hace visible #login.
-      $('#login').classList.remove('oculto'); // Quita clase oculto al modal de login.
-      // Cursor en Usuario. // Enfoca primer campo del formulario.
-      $('#l-usuario').focus(); // Coloca el cursor en #l-usuario.
-    } // Fin pedirLogin.
-
-    // Envía usuario y contraseña. // Autentica contra /api/login.
-    async function entrar() { // Función asíncrona de inicio de sesión.
-      // Botón Entrar. // Referencia a #b-login.
-      const b = $('#b-login'); // Obtiene botón Entrar.
-      // Evita doble clic. // Deshabilita botón durante petición.
-      b.disabled = true; // Bloquea #b-login.
-      // Limpia errores. // Borra error previo de ingreso.
-      $('#e-login').textContent = ''; // Vacía #e-login.
-      // Quita marcas rojas. // Limpia aria-invalid en #login.
-      limpiarMarcas('#login'); // Quita marcas de error previas.
-      // Intenta ingresar. // Envía credenciales al servidor.
-      try { // Intenta iniciar sesión.
-        // El servidor recibe lo escrito como 'nombre' y la contraseña como 'pin'. // Envía payload de login.
-        await api('/api/login', { nombre: $('#l-usuario').value, pin: $('#l-pin').value }); // Llama a POST /api/login.
-        // Éxito: esconde el ingreso... // Oculta modal #login.
-        $('#login').classList.add('oculto'); // Agrega clase oculto a #login.
-        // ...no deja la contraseña en pantalla... // Limpia PIN por seguridad.
-        $('#l-pin').value = ''; // Borra valor de #l-pin.
-        // ...carga los datos... // Solicita datos de la sesión iniciada.
-        await cargar(); // Carga información del sistema.
-        // ...y reenvía citas guardadas sin internet. // Intenta sincronizar pendientes offline.
-        reenviarPendientes(); // Reenvía cola de citas pendientes.
-      // Si falla... // Captura error de credenciales o bloqueo.
-      } catch (x) { // Maneja error x.
-        // ...muestra el motivo ('Usuario o contraseña incorrectos' o el bloqueo)... // Muestra mensaje en #e-login.
-        $('#e-login').textContent = x.mensaje; // Escribe motivo del fallo.
-        // ...marca el campo... // Resalta campo asociado si existe.
-        marcarCampo(x.campo); // Marca campo con aria-invalid y enfoca.
-        // ...y selecciona la contraseña para reescribirla. // Selecciona texto en #l-pin.
-        $('#l-pin').select(); // Selecciona contenido de #l-pin para facilitar corrección.
-      } // Fin catch.
-      // Reactiva el botón. // Habilita #b-login.
-      b.disabled = false; // Quita estado disabled.
-    } // Fin entrar.
-
-    // Clic en Entrar. // Vincula clic a entrar().
-    $('#b-login').onclick = entrar; // Ejecuta entrar al hacer clic en #b-login.
-    // Enter en Usuario pasa a Contraseña. // Navegación con Enter desde usuario.
-    $('#l-usuario').addEventListener('keydown', e => { if (e.key === 'Enter') $('#l-pin').focus(); }); // Pasa foco a #l-pin al pulsar Enter.
-    // Enter en Contraseña entra. // Envío con Enter desde contraseña.
-    $('#l-pin').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); }); // Ejecuta entrar() al pulsar Enter en #l-pin.
-
-    // Ajusta la pantalla según quién ingresó. // Aplica rol y nombre del usuario activo.
-    function aplicarSesion() { // Actualiza elementos de sesión en UI.
-      // Nombre en el menú. // Muestra nombre de usuario.
-      $('#u-nombre').textContent = sesion ? sesion.nombre : ''; // Pone nombre o vacío.
-      // Rol: 'Acceso completo' o 'Recepción'. // Muestra etiqueta amigable del rol.
-      $('#u-rol').textContent = sesion ? (sesion.rol === 'doctora' ? 'Acceso completo' : 'Recepción') : ''; // Traduce rol interno a texto visible.
-      // El Historial de cambios solo se ve si es la doctora. // Muestra/oculta botón de auditoría.
-      $('#nav-auditoria').classList.toggle('oculto', !(sesion && sesion.rol === 'doctora')); // Solo visible para rol 'doctora'.
-      // Por seguridad también esconde la sección. // Oculta vista #v-auditoria si no es doctora.
-      if (!sesion || sesion.rol !== 'doctora') $('#v-auditoria').classList.add('oculto'); // Asegura que la sección no quede visible.
-    } // Fin aplicarSesion.
-
-    // Cerrar sesión: // Manejador de clic en #b-salir.
-    $('#b-salir').onclick = async () => { // Cierra sesión en servidor y muestra login.
-      // Avisa al servidor (si falla, igual sigue). // Llama a POST /api/logout.
-      try { await api('/api/logout', {}); } catch (e) {} // Ignora error de red al cerrar sesión.
-      // Vuelve a la primera sección. // Restablece vista 'nueva'.
-      mostrarVista('nueva'); // Vuelve a pestaña nueva cita.
-      // Muestra el ingreso. // Abre pantalla de login.
-      pedirLogin(); // Muestra #login limpio.
-    }; // Fin onclick #b-salir.
-
-    // Historial de cambios. // Vista de auditoría para rol doctora.
-    /* ---------- historial de cambios (solo doctora) ---------- */ // Sección de auditoría.
-    // Traduce cada acción interna a una frase para la doctora. // Diccionario de acciones auditadas.
-    const ACCIONES = { // Mapea códigos de acción a descripciones en español.
-      crear: 'Registró un paciente', // Acción de creación de paciente.
-      agendar: 'Agendó una cita', // Acción de agendamiento de cita.
-      cancelar: 'Canceló una cita', // Acción de cancelación de cita.
-      reactivar: 'Reactivó una cita', // Acción de reactivación de cita.
-      ingresar: 'Ingresó al sistema', // Acción de login exitoso.
-      ingreso_fallido: 'Intento de ingreso con PIN incorrecto' // Acción de login fallido.
-    }; // Fin ACCIONES.
-
-    // Dibuja los eventos. // Consulta y renderiza /api/auditoria.
-    async function pintarAuditoria() { // Carga y dibuja eventos en #lista-aud.
-      // Contenedor. // Referencia a #lista-aud.
-      const cont = $('#lista-aud'); // Obtiene contenedor de historial.
-      // Intenta pedirlos. // Llama a GET /api/auditoria.
-      try { // Intenta obtener eventos del servidor.
-        // Solo responde a la doctora (403 si no). // Solicita lista de eventos.
-        const r = await api('/api/auditoria'); // Espera respuesta con eventos.
-        // Una tarjeta por evento: fecha, quién, qué hizo y a qué (cita o paciente); los intentos fallidos van con borde rojo. // Renderiza tarjetas de auditoría.
-        cont.innerHTML = r.eventos.map(e => ` // Mapea cada evento a una tarjeta .evento.
-          <div class="card evento ${e.accion === 'ingreso_fallido' ? 'malo' : ''}"> <!-- Marca intentos fallidos con clase malo. -->
-            <time>${esc(new Date(e.cuando).toLocaleString('es-EC', { // Formatea marca de tiempo en es-EC.
-              day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' // Día, mes corto, hora y minuto.
-            }))}</time> <!-- Fin time. -->
-            <div><b>${esc(e.usuario)}</b> · ${esc(ACCIONES[e.accion] || e.accion)}</div> <!-- Usuario y descripción de acción. -->
-            ${(e.entidad === 'cita' || e.entidad === 'paciente') // Si el evento referencia cita o paciente.
-              ? `<small>${esc(e.entidad)} n.º ${esc(e.entidad_id)}${e.detalle ? ' · ' + esc(e.detalle) : ''}</small>` // Muestra entidad, ID y detalle opcional.
-              : ''} <!-- Sin detalle adicional si no aplica. -->
-          </div> <!-- Fin tarjeta .evento. -->
-        `).join('') || '<div class="vacio">Todavía no hay movimientos.</div>'; // Mensaje si no hay eventos.
-      // Si falla... // Captura error de permiso o red.
-      } catch (x) { // Maneja error x.
-        // ...muestra el motivo. // Escribe mensaje de error en #lista-aud.
-        cont.innerHTML = `<div class="vacio">${esc(x.mensaje)}</div>`; // Muestra error escapado.
-      } // Fin catch.
-    } // Fin pintarAuditoria.
-
-    // Si se cae el internet (Clínica Sur). // Cola local de citas sin conexión.
-    /* ---------- citas pendientes cuando se cae el internet (Clínica Sur) ---------- */ // Sección offline.
-    // Nombre bajo el que se guardan en este equipo. // Clave de localStorage.
-    const LLAVE_PEND = 'msls_pendientes'; // Nombre de clave para pendientes.
-    // Lee las pendientes (lista vacía si no hay o si falla). // Recupera lista de pendientes.
-    const leerPend = () => { // Lee y parsea pendientes desde localStorage.
-      try { return JSON.parse(localStorage.getItem(LLAVE_PEND) || '[]'); } catch (e) { return []; } // Retorna array o [] ante error.
-    }; // Fin leerPend.
-    // Guarda la lista; devuelve true si se pudo. // Persiste lista en localStorage.
-    const guardarPend = l => { // Recibe arreglo l.
-      try { localStorage.setItem(LLAVE_PEND, JSON.stringify(l)); return true; } catch (e) { return false; } // Intenta guardar y retorna éxito booleano.
-    }; // Fin guardarPend.
-    // Genera un identificador único para cada intento (UUID, o uno de reserva). // Genera clave de idempotencia.
-    const nuevaClave = () => (window.crypto && crypto.randomUUID) // Usa randomUUID si está disponible.
-      ? crypto.randomUUID() // UUID estándar criptográfico.
-      : Date.now().toString(36) + Math.random().toString(36).slice(2, 12); // Respaldo combinando timestamp y aleatorio.
-
-    // Muestra u oculta el aviso amarillo con las pendientes. // Renderiza banner #pendientes.
-    function pintarPend() { // Actualiza vista de citas pendientes.
-      // Lista y contenedor. // Obtiene pendientes y elemento #pendientes.
-      const l = leerPend(), box = $('#pendientes'); // Lee lista local y selecciona contenedor.
-      // Se oculta si no hay pendientes. // Alterna clase oculto según longitud.
-      box.classList.toggle('oculto', !l.length); // Oculta si l está vacío.
-      // Cantidad, advertencia de que NO están reservadas, cada cita con botón Descartar y botón Reintentar ahora. // Construye HTML del banner.
-      box.innerHTML = !l.length // Si no hay pendientes.
-        ? '' // Vacía contenido.
-        : `<b>⏳ ${l.length} cita(s) guardada(s) en este equipo, SIN confirmar todavía</b> <!-- Encabezado de advertencia. -->
-           <small>Se enviarán solas cuando vuelva el internet. Hasta entonces la hora NO está reservada.</small>` // Aviso de no confirmación.
-          + l.map(p => ` // Renderiza cada cita pendiente.
-              <div class="pend-fila"> <!-- Fila de cita pendiente. -->
-                <span>${esc(p.texto)}${p.error ? `<br><em>No se pudo confirmar: ${esc(p.error)}</em>` : ''}</span> <!-- Resumen y error si fue rechazada. -->
-                <button type="button" class="chico" data-clave="${esc(p.clave)}">Descartar</button> <!-- Botón para eliminar pendiente. -->
-              </div> <!-- Fin .pend-fila. -->
-            `).join('') // Une filas pendientes.
-          + '<button type="button" class="chico" id="b-reintentar" style="margin-top:10px">Reintentar ahora</button>'; // Botón de reintento manual.
-    } // Fin pintarPend.
-
-    // Maneja los botones del aviso. // Delegación de clics en #pendientes.
-    $('#pendientes').onclick = ev => { // Maneja reintentar o descartar pendiente.
-      // Reintentar ahora. // Si se pulsó #b-reintentar.
-      if (ev.target.id === 'b-reintentar') return reenviarPendientes(); // Dispara reenvío manual.
-      // Clave de la cita a descartar. // Lee data-clave del botón descartar.
-      const c = ev.target.dataset && ev.target.dataset.clave; // Obtiene clave si existe.
-      // Si hay, la quita de la lista y vuelve a pintar. // Elimina elemento y actualiza vista.
-      if (c) { guardarPend(leerPend().filter(p => p.clave !== c)); pintarPend(); } // Filtra clave descartada, guarda y redibuja.
-    }; // Fin onclick #pendientes.
-
-    // Evita enviar dos veces a la vez. // Bandera de control de concurrencia en reenvío.
-    let enviando = false; // Indica si reenviarPendientes() está en ejecución.
-    // Envía las citas guardadas. // Sincroniza cola offline con /api/citas.
-    async function reenviarPendientes() { // Procesa citas pendientes en orden.
-      // Si ya está enviando o no hay sesión, no hace nada. // Evita ejecuciones paralelas o sin sesión.
-      if (enviando || !sesion) return; // Sale si ya envía o no hay sesión activa.
-      // Marca que está enviando. // Activa bloqueo de reenvío.
-      enviando = true; // Marca en progreso.
-      // Si se confirmó alguna, y la lista. // Estado de confirmación y copia de lista.
-      let enviado = false, l = leerPend(); // Inicializa bandera y lee pendientes.
-      // Recorre cada pendiente. // Itera sobre cada cita guardada.
-      for (const p of l) { // Recorre cola pendiente.
-        // Las rechazadas por el servidor esperan decisión humana. // Omite ítems con error previo.
-        if (p.error) continue; // Pasa al siguiente si ya fue rechazada por el servidor.
-        // Intenta enviarla (con su clave, así no se duplica). // Envía cita con su clave única.
-        try { // Intenta confirmar cita en API.
-          // Envía. // Llama a POST /api/citas.
-          await api('/api/citas', p.cuerpo); // Envía cuerpo guardado.
-          // Si se confirmó, la quita... // Elimina cita confirmada de la lista.
-          l = l.filter(x => x.clave !== p.clave); // Quita ítem por clave.
-          // ...y guarda la lista. // Persiste lista actualizada.
-          guardarPend(l); // Guarda cambios en localStorage.
-          // Anota que hubo confirmación. // Marca que al menos una cita se confirmó.
-          enviado = true; // Activa bandera de actualización.
-          // Avisa. // Muestra toast de confirmación.
-          aviso('✔ Se confirmó la cita pendiente: ' + p.texto); // Notifica confirmación.
-        // Si falla... // Captura error de red, sesión o negocio.
-        } catch (x) { // Maneja error x.
-          // ...sin internet o sin sesión: se detiene y reintenta después... // Detiene bucle si falta red o sesión.
-          if (x.offline || x.estado === 401) break; // Sale del bucle para reintentar más adelante.
-          // ...si el servidor la rechazó (ej. la hora ya fue tomada), guarda el motivo... // Registra error de negocio en el ítem.
-          p.error = x.mensaje; // Guarda motivo del rechazo.
-          // ...para que una persona decida. // Guarda lista con el error registrado.
-          guardarPend(l); // el servidor la rechazó (ej. la hora ya fue tomada): que una persona decida // Persiste error para revisión manual.
-        } // Fin catch.
-      } // Fin for.
-      // Termina. // Libera bandera de envío.
-      enviando = false; // Permite futuros reenvíos.
-      // Actualiza el aviso. // Redibuja #pendientes.
-      pintarPend(); // Actualiza banner de pendientes.
-      // Si hubo confirmaciones, refresca los datos. // Recarga datos desde servidor si hubo cambios.
-      if (enviado) cargar(); // Sincroniza agenda y contadores.
-    } // Fin reenviarPendientes.
-
-    // Cuando vuelve el internet, reenvía. // Listener de evento online del navegador.
-    window.addEventListener('online', reenviarPendientes); // Reintenta enviar pendientes al recuperar conexión.
-    // Cada 30 segundos reintenta si hay pendientes sin error. // Reintento periódico automático.
-    setInterval(() => { if (leerPend().some(p => !p.error)) reenviarPendientes(); }, 30000); // Revisa cada 30s si hay pendientes reintentables.
-    // Al cargar la página, muestra las pendientes que hubiera. // Render inicial de pendientes.
-    pintarPend(); // Dibuja pendientes almacenadas al iniciar.
-  <!-- Aquí termina el JavaScript. --> // Fin del bloque de script.
-  </script> <!-- Fin de script. -->
-</body> <!-- Fin de body. -->
-</html> <!-- Fin del documento HTML. -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clínica MSLS+ · Agenda de citas</title>
+  <style>
+    :root {
+      --tinta: #14292b;
+      --suave: #53676a;
+      --linea: #cddcdc;
+      --fondo: #eaf3f4;
+      --papel: #fff;
+      --teal: #0f4c4e;
+      --teal2: #15696b;
+      --menta: #d9ebe8;
+      --cielo: #3d7ea6;
+      --oro: #c79a3b;
+      --peligro: #a2392f;
+      --peligro-f: #fbeceb;
+      --aviso: #f3e8c4;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      --sans: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { font-size: 18px; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--fondo);
+      color: var(--tinta);
+      font-family: var(--sans);
+      line-height: 1.5;
+    }
+    h1, h2, h3 { margin: 0; line-height: 1.15; }
+    .oculto { display: none !important; }
+    svg.ic {
+      width: 1.25em;
+      height: 1.25em;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex: none;
+    }
+
+    /* ===== PORTADA ===== */
+    .portada {
+      min-height: 100vh;
+      background: #e4efee url('fondo_suave.svg') center/cover no-repeat;
+    }
+    .p-nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 22px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .marca-mini {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: var(--teal);
+    }
+    .marca-mini b { color: var(--oro); }
+    .p-nav button {
+      background: none;
+      border: 1.5px solid var(--teal);
+      color: var(--teal);
+      border-radius: 10px;
+      font: inherit;
+      min-height: 44px;
+      padding: 0 18px;
+      cursor: pointer;
+    }
+    .p-nav button:hover { background: var(--teal); color: #fff; }
+
+    .hero {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 36px 28px 28px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 48px;
+      align-items: center;
+    }
+    .hero .saludo { margin: 0 0 10px; color: var(--teal2); font-weight: 650; }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--teal);
+      letter-spacing: -0.015em;
+    }
+    .hero h1 em { font-style: normal; color: var(--oro); }
+    .hero p.lead {
+      font-size: 1.1rem;
+      color: var(--suave);
+      max-width: 34ch;
+      margin: 18px 0 28px;
+    }
+    .acciones { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn {
+      min-height: 54px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--teal);
+      color: #fff;
+      font: inherit;
+      font-weight: 650;
+      font-size: 1.02rem;
+      padding: 0 28px;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn:hover { background: var(--teal2); }
+    .btn:disabled { opacity: 0.6; cursor: wait; }
+    .btn.sec { background: #fff; color: var(--teal); border: 1.5px solid var(--teal); }
+    .btn.sec:hover { background: var(--menta); }
+    .btn.bloque { width: 100%; margin-top: 22px; }
+
+    .maqueta { position: relative; padding: 10px 0 30px 20px; }
+    .m-card {
+      background: var(--papel);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(15, 76, 78, 0.14);
+      padding: 20px 22px;
+    }
+    .m-cab {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .m-cab b { font-family: var(--serif); font-size: 1.15rem; color: var(--teal); }
+    .m-ok {
+      font-size: 0.78rem;
+      background: var(--menta);
+      color: var(--teal);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .m-fila {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 11px 0;
+      border-top: 1px solid var(--linea);
+    }
+    .m-fila time { font-weight: 700; color: var(--teal); }
+    .m-fila small { display: block; color: var(--suave); }
+    .punto { width: 10px; height: 10px; border-radius: 50%; background: var(--teal2); }
+    .punto.n { background: var(--cielo); }
+    .punto.s { background: var(--oro); }
+    .m-flota {
+      position: absolute;
+      left: -6px;
+      bottom: 0;
+      background: var(--teal);
+      color: #fff;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: 0 12px 28px rgba(15, 76, 78, 0.28);
+    }
+    .m-flota u { color: #f3d68a; text-underline-offset: 3px; }
+
+    .sedes {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 8px 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .sede {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--linea);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .sede .punto { width: 14px; height: 14px; }
+    .sede b { display: block; font-family: var(--serif); font-size: 1.1rem; }
+    .sede small { color: var(--suave); }
+
+    .pilares {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 16px 28px 56px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .pilar {
+      background: var(--teal);
+      color: #e9f4f2;
+      border-radius: 18px;
+      padding: 26px 28px;
+    }
+    .pilar:nth-child(2) {
+      background: var(--papel);
+      color: var(--tinta);
+      border: 1px solid var(--linea);
+    }
+    .pilar h2 { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 8px; }
+    .pilar:nth-child(2) h2 { color: var(--teal); }
+    .pilar p { margin: 0; }
+
+    /* ===== SISTEMA ===== */
+    .app { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; }
+    aside {
+      background: var(--teal);
+      color: #e6f2f0;
+      padding: 26px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .logo {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 1.45rem;
+      padding: 0 12px 22px;
+      color: #fff;
+    }
+    .logo b { color: #f3d68a; }
+    nav button {
+      width: 100%;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      color: #cfe5e2;
+      font: inherit;
+      padding: 13px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    nav button:hover { background: rgba(255, 255, 255, 0.09); }
+    nav button.on { background: #fff; color: var(--teal); font-weight: 650; }
+
+    .usuario {
+      margin-top: auto;
+      padding: 14px 10px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .usuario label { color: #b9d6d2; }
+    aside .btn-volver {
+      margin-top: 10px;
+      background: none;
+      border: 0;
+      color: #b9d6d2;
+      font: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: left;
+      padding: 8px 14px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    main {
+      padding: 30px 34px 64px;
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .cab {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .cab h1 { font-family: var(--serif); font-size: 2rem; color: var(--teal); }
+    .cab p { margin: 6px 0 0; color: var(--suave); max-width: 54ch; }
+    .fecha-hoy {
+      font-size: 0.9rem;
+      color: var(--teal2);
+      background: var(--menta);
+      padding: 6px 14px;
+      border-radius: 999px;
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
+
+    label { display: block; font-size: 0.88rem; color: var(--suave); margin: 16px 0 6px; }
+    input, select {
+      width: 100%;
+      min-height: 50px;
+      font: inherit;
+      color: var(--tinta);
+      background: #fff;
+      border: 1.5px solid #aebfc0;
+      border-radius: 10px;
+      padding: 8px 14px;
+    }
+    input::placeholder { color: #7d8d90; }
+    input:focus, select:focus, button:focus-visible {
+      outline: 3px solid #7fb6b8;
+      outline-offset: 2px;
+    }
+    input[aria-invalid="true"], select[aria-invalid="true"] {
+      border-color: var(--peligro);
+      background: var(--peligro-f);
+    }
+    .ayuda { display: block; font-size: 0.8rem; color: var(--suave); margin-top: 4px; }
+    aside select { background: rgba(255, 255, 255, 0.95); }
+
+    .card {
+      background: var(--papel);
+      border: 1px solid var(--linea);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 14px;
+    }
+    .card h3 {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      color: var(--teal);
+      margin-bottom: 2px;
+    }
+    .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .dos { display: grid; grid-template-columns: 1fr 320px; gap: 18px; align-items: start; }
+    .resumen { background: var(--menta); border: 0; position: sticky; top: 20px; }
+    .resumen dl { margin: 14px 0 0; }
+    .resumen dt { font-size: 0.8rem; color: var(--teal2); margin-top: 12px; }
+    .resumen dd { margin: 2px 0 0; font-weight: 650; }
+    .resumen dd.vacio-r { color: #7a9a97; font-weight: 400; }
+
+    .chico {
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 10px;
+      border: 1.5px solid var(--linea);
+      background: #fff;
+      color: var(--tinta);
+      font: inherit;
+      cursor: pointer;
+    }
+    .chico:hover { background: var(--menta); }
+    .chico.peligro { border-color: #d9a8a3; color: var(--peligro); }
+    .chico.peligro:hover { background: var(--peligro-f); }
+    .chico.ok { border-color: var(--teal); color: var(--teal); }
+
+    .error {
+      background: var(--peligro-f);
+      border: 1.5px solid #d9a8a3;
+      color: #6e231c;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-top: 16px;
+    }
+    .error:empty { display: none; }
+
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 6px; }
+    .stat {
+      background: var(--papel);
+      border: 1px solid var(--linea);
+      border-radius: 14px;
+      padding: 14px 18px;
+    }
+    .stat b {
+      display: block;
+      font-family: var(--serif);
+      font-size: 1.9rem;
+      color: var(--teal);
+      line-height: 1.1;
+    }
+    .stat span { font-size: 0.85rem; color: var(--suave); }
+
+    .dia {
+      margin: 26px 2px 10px;
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-transform: capitalize;
+      color: var(--teal);
+    }
+    .cita {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      border-left: 6px solid var(--teal2);
+      padding: 16px 20px;
+    }
+    .cita.norte { border-left-color: var(--cielo); }
+    .cita.sur { border-left-color: var(--oro); }
+    .hora {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      min-width: 80px;
+      color: var(--teal);
+    }
+    .info { flex: 1; min-width: 180px; }
+    .info small { color: var(--suave); display: block; }
+    .chip {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      margin-left: 8px;
+      background: var(--aviso);
+      color: #4d4220;
+    }
+    .cita.cancelada { background: #f3f6f6; border-left-color: #b6c4c4; }
+    .cancelada .hora, .cancelada .info b {
+      text-decoration: line-through;
+      color: var(--suave);
+    }
+    .vacio { text-align: center; color: var(--suave); padding: 40px 10px; }
+
+    .pac { display: flex; gap: 14px; align-items: center; padding: 14px 18px; }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--menta);
+      color: var(--teal);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      flex: none;
+    }
+    .pac small { display: block; color: var(--suave); font-size: 0.88rem; }
+
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 90px;
+      transform: translateX(-50%);
+      background: var(--tinta);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+      z-index: 9;
+      max-width: 92vw;
+    }
+    #toast button {
+      background: none;
+      border: 0;
+      color: #a9dcdc;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 40px;
+    }
+
+    .aviso-pend {
+      background: var(--aviso);
+      border: 1.5px solid var(--oro);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+    .aviso-pend small { display: block; margin: 4px 0 10px; color: #4d4220; }
+    .pend-fila {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.12);
+    }
+    .pend-fila em { color: var(--peligro); font-style: normal; }
+
+    #login {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 41, 43, 0.75);
+      display: grid;
+      place-items: center;
+      z-index: 20;
+      padding: 16px;
+    }
+    .login-card { width: min(420px, 100%); margin: 0; }
+    .login-card h2 { font-family: var(--serif); color: var(--teal); margin-bottom: 4px; }
+    .u-nombre { display: block; font-size: 0.9rem; color: #fff; margin-bottom: 2px; }
+    .u-rol { display: block; font-size: 0.78rem; color: #b9d6d2; }
+
+    .evento { display: grid; grid-template-columns: 150px 1fr; gap: 4px 16px; padding: 12px 18px; }
+    .evento time { color: var(--suave); font-size: 0.88rem; }
+    .evento small { color: var(--suave); grid-column: 2; }
+    .evento.malo { border-left: 5px solid var(--peligro); }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 28px; }
+      .hero h1 { font-size: 2.7rem; }
+      .sedes, .pilares { grid-template-columns: 1fr; }
+      .dos { grid-template-columns: 1fr; }
+      .resumen { position: static; order: -1; }
+    }
+    @media (max-width: 820px) {
+      .app { grid-template-columns: 1fr; }
+      aside {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        height: auto;
+        flex-direction: row;
+        padding: 6px;
+        z-index: 5;
+      }
+      .logo, .usuario, aside .btn-volver { display: none; }
+      nav { display: flex; width: 100%; gap: 6px; }
+      nav button {
+        flex-direction: column;
+        gap: 2px;
+        justify-content: center;
+        font-size: 0.8rem;
+        padding: 8px 4px;
+        text-align: center;
+      }
+      main { padding: 22px 14px 120px; }
+      .fila { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      #toast { bottom: 100px; }
+      .evento { grid-template-columns: 1fr; }
+      .evento small { grid-column: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sprite de íconos SVG -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-3.6 3.4-5.5 7-5.5s6.3 1.9 7 5.5"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></symbol>
+      <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ===== PORTADA ===== -->
+  <div id="vista-portada" class="portada">
+    <header class="p-nav">
+      <span class="marca-mini">MSLS<b>+</b></span>
+      <button type="button" id="b-nav-citas">Ver citas</button>
+    </header>
+
+    <section class="hero">
+      <div>
+        <p class="saludo">Bienvenido a MSLS+</p>
+        <h1>Cada cita, en su <em>hora</em>.</h1>
+        <p class="lead">Agende, cambie o cancele citas en tres clínicas sin cruces ni pérdidas, con pocos pasos y letra clara.</p>
+        <div class="acciones">
+          <button type="button" class="btn" id="b-agenda-ahora">
+            <svg class="ic"><use href="#i-cal"/></svg>Agenda tu cita ahora
+          </button>
+        </div>
+      </div>
+
+      <div class="maqueta" aria-hidden="true">
+        <div class="m-card">
+          <div class="m-cab"><b>Agenda de hoy</b><span class="m-ok">Sin cruces</span></div>
+          <div class="m-fila"><time>09:00</time><div>Consulta general<small>Clínica Centro</small></div><i class="punto"></i></div>
+          <div class="m-fila"><time>09:30</time><div>Control pediátrico<small>Clínica Norte</small></div><i class="punto n"></i></div>
+          <div class="m-fila"><time>10:15</time><div>Chequeo anual<small>Clínica Sur</small></div><i class="punto s"></i></div>
+        </div>
+        <div class="m-flota">
+          <svg class="ic"><use href="#i-back"/></svg>
+          <span>Cita cancelada · <u>Deshacer</u></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="sedes" aria-label="Nuestras clínicas">
+      <div class="sede"><i class="punto"></i><div><b>Clínica Centro</b><small>Consulta general</small></div></div>
+      <div class="sede"><i class="punto n"></i><div><b>Clínica Norte</b><small>Atención familiar</small></div></div>
+      <div class="sede"><i class="punto s"></i><div><b>Clínica Sur</b><small>Atención preventiva</small></div></div>
+    </section>
+
+    <section class="pilares">
+      <div class="pilar">
+        <h2>Visión</h2>
+        <p>Ser la principal clínica de salud, ofreciendo servicios de calidad y atención personalizada a nuestros pacientes.</p>
+      </div>
+      <div class="pilar">
+        <h2>A qué nos dedicamos</h2>
+        <p>Ofrecemos atención médica integral, consultas preventivas y acompañamiento cercano para cuidar la salud de nuestros pacientes.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== SISTEMA ===== -->
+  <div id="vista-sistema" class="app oculto">
+    <aside>
+      <div class="logo">Clin<b>Agenda</b></div>
+      <nav>
+        <button type="button" data-v="nueva" class="on"><svg class="ic"><use href="#i-plus"/></svg>Nueva cita</button>
+        <button type="button" data-v="citas"><svg class="ic"><use href="#i-cal"/></svg>Citas</button>
+        <button type="button" data-v="pacientes"><svg class="ic"><use href="#i-users"/></svg>Pacientes</button>
+        <button type="button" data-v="auditoria" id="nav-auditoria" class="oculto"><svg class="ic"><use href="#i-shield"/></svg>Historial de cambios</button>
+      </nav>
+      <button type="button" class="btn-volver" id="b-volver-portada">Volver al inicio</button>
+      <div class="usuario">
+        <span class="u-nombre" id="u-nombre"></span>
+        <span class="u-rol" id="u-rol"></span>
+        <button type="button" class="btn-volver" id="b-salir">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main>
+      <div id="pendientes" class="aviso-pend oculto" role="status"></div>
+
+      <!-- NUEVA CITA -->
+      <section id="v-nueva">
+        <div class="cab">
+          <div>
+            <h1>¿Para quién es la cita?</h1>
+            <p>Complete los datos. Si algo no está bien, le diremos qué corregir sin borrar lo que escribió.</p>
+          </div>
+          <span class="fecha-hoy" id="fecha-hoy"></span>
+        </div>
+
+        <div class="dos">
+          <div class="card">
+            <h3>Datos de la cita</h3>
+            <label for="buscar">Buscar paciente (escriba parte del nombre)</label>
+            <input id="buscar" placeholder="Ejemplo: maria" autocomplete="off" maxlength="60">
+
+            <label for="c-paciente">Paciente</label>
+            <select id="c-paciente"></select>
+
+            <div class="fila">
+              <div>
+                <label for="c-medico">Médico</label>
+                <select id="c-medico"></select>
+              </div>
+              <div>
+                <label for="c-clinica">Clínica</label>
+                <select id="c-clinica"></select>
+                <span class="ayuda" id="c-horario"></span>
+              </div>
+            </div>
+
+            <div class="fila">
+              <div>
+                <label for="c-fecha">Fecha</label>
+                <input type="date" id="c-fecha">
+              </div>
+              <div>
+                <label for="c-hora">Hora</label>
+                <input type="time" id="c-hora" step="900">
+              </div>
+            </div>
+
+            <label for="c-dur">Duración</label>
+            <select id="c-dur">
+              <option value="15">15 minutos</option>
+              <option value="30" selected>30 minutos</option>
+              <option value="45">45 minutos</option>
+              <option value="60">1 hora</option>
+            </select>
+
+            <div class="error" id="e-cita" role="alert"></div>
+            <button type="button" class="btn bloque" id="b-cita">Agendar cita</button>
+          </div>
+
+          <aside class="card resumen" aria-live="polite">
+            <h3>Resumen</h3>
+            <dl>
+              <dt>Paciente</dt><dd id="r-paciente"></dd>
+              <dt>Médico</dt><dd id="r-medico"></dd>
+              <dt>Clínica</dt><dd id="r-clinica"></dd>
+              <dt>Día y hora</dt><dd id="r-cuando"></dd>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <!-- CITAS -->
+      <section id="v-citas" class="oculto">
+        <div class="cab">
+          <div>
+            <h1>Citas</h1>
+            <p>Las citas canceladas no se borran: puede reactivarlas con “Deshacer”.</p>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><b id="s-activas">0</b><span>Citas activas</span></div>
+          <div class="stat"><b id="s-canceladas">0</b><span>Canceladas</span></div>
+          <div class="stat"><b id="s-hoy">0</b><span>Para hoy</span></div>
+        </div>
+        <label for="f-clinica">Mostrar</label>
+        <select id="f-clinica"><option value="">Todas las clínicas</option></select>
+        <div id="lista-citas"></div>
+      </section>
+
+      <!-- HISTORIAL (solo doctora) -->
+      <section id="v-auditoria" class="oculto">
+        <div class="cab">
+          <div>
+            <h1>Historial de cambios</h1>
+            <p>Quién hizo qué y cuándo. Esta lista no se puede borrar desde el sistema.</p>
+          </div>
+        </div>
+        <div id="lista-aud"></div>
+      </section>
+
+      <!-- PACIENTES -->
+      <section id="v-pacientes" class="oculto">
+        <div class="cab">
+          <div>
+            <h1>Pacientes</h1>
+            <p>Registre a un paciente nuevo. Nombre completo y fecha de nacimiento son obligatorios.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <label for="p-nombre" style="margin-top:0">Nombre completo *</label>
+          <input id="p-nombre" autocomplete="off" maxlength="100" placeholder="Nombre y apellido">
+
+          <div class="fila">
+            <div>
+              <label for="p-nac">Fecha de nacimiento *</label>
+              <input type="date" id="p-nac">
+            </div>
+            <div>
+              <label for="p-tipo">Documento</label>
+              <select id="p-tipo">
+                <option value="cedula">Cédula</option>
+                <option value="pasaporte">Pasaporte</option>
+                <option value="ninguno">Todavía no tiene</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="p-doc-box">
+            <label for="p-doc">Número de documento</label>
+            <input id="p-doc" inputmode="numeric" autocomplete="off" maxlength="10" placeholder="10 números">
+            <span class="ayuda" id="p-doc-ayuda">La cédula tiene 10 números, sin espacios.</span>
+          </div>
+
+          <div class="fila">
+            <div>
+              <label for="p-tel">Teléfono (opcional)</label>
+              <input id="p-tel" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="0991234567">
+            </div>
+            <div>
+              <label for="p-cor">Correo (opcional)</label>
+              <input id="p-cor" type="email" inputmode="email" autocomplete="off" maxlength="120" placeholder="nombre@correo.com">
+            </div>
+          </div>
+
+          <label for="p-resp">Teléfono de un familiar o tutor (opcional)</label>
+          <input id="p-resp" type="tel" inputmode="tel" autocomplete="off" maxlength="16" placeholder="0991234567">
+
+          <div class="error" id="e-pac" role="alert"></div>
+          <button type="button" class="btn bloque" id="b-pac">Guardar paciente</button>
+          <button type="button" class="btn sec bloque oculto" id="b-pac-igual" style="margin-top:10px">Es otra persona: crear igual</button>
+        </div>
+
+        <div id="lista-pac"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL LOGIN -->
+  <div id="login" class="oculto" role="dialog" aria-modal="true" aria-labelledby="l-titulo">
+    <div class="card login-card">
+      <h2 id="l-titulo">Ingrese a MSLS+</h2>
+      <label for="l-usuario">¿Quién es usted?</label>
+      <select id="l-usuario"></select>
+      <label for="l-pin">PIN (solo números)</label>
+      <input id="l-pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12">
+      <div class="error" id="e-login" role="alert"></div>
+      <button type="button" class="btn bloque" id="b-login">Entrar</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="oculto" role="status" aria-live="polite"></div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+    const sinTildes = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const hoyLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    const claseSede = n => /norte/i.test(n) ? 'norte' : /sur/i.test(n) ? 'sur' : '';
+
+    let datos = { clinicas: [], medicos: [], pacientes: [], citas: [], horarios: [] };
+    let sesion = null;
+
+    $('#fecha-hoy').textContent = new Date().toLocaleDateString('es-EC', {
+      weekday: 'long', day: 'numeric', month: 'long'
+    });
+
+    /* ---------- portada <-> sistema ---------- */
+    function mostrarVista(v) {
+      document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x.dataset.v === v));
+      ['nueva', 'citas', 'pacientes', 'auditoria'].forEach(k => {
+        $('#v-' + k).classList.toggle('oculto', k !== v);
+      });
+    }
+    function abrirSistema(vista = 'nueva') {
+      $('#vista-portada').classList.add('oculto');
+      $('#vista-sistema').classList.remove('oculto');
+      mostrarVista(vista);
+      window.scrollTo({ top: 0 });
+      cargar();
+    }
+    function volverPortada() {
+      $('#vista-sistema').classList.add('oculto');
+      $('#vista-portada').classList.remove('oculto');
+      window.scrollTo({ top: 0 });
+    }
+    $('#b-agenda-ahora').onclick = () => abrirSistema('nueva');
+    $('#b-nav-citas').onclick = () => abrirSistema('citas');
+    $('#b-volver-portada').onclick = volverPortada;
+
+    /* ---------- red / api ---------- */
+    async function api(ruta, cuerpo) {
+      let r, j;
+      try {
+        r = await fetch(ruta, cuerpo === undefined
+          ? {}
+          : {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(cuerpo)
+            });
+        j = await r.json();
+      } catch (e) {
+        throw {
+          offline: true,
+          mensaje: 'No hay conexión con el sistema. Lo que escribió sigue en pantalla: intente de nuevo en un momento.'
+        };
+      }
+      if (!r.ok) {
+        if (r.status === 401 && j.codigo === 'sin_sesion') pedirLogin();
+        throw {
+          mensaje: j.error || 'Algo salió mal. Intente de nuevo.',
+          codigo: j.codigo,
+          campo: j.campo,
+          estado: r.status
+        };
+      }
+      return j;
+    }
+
+    let tt;
+    function aviso(texto, accion) {
+      const t = $('#toast');
+      t.innerHTML = `<span>${esc(texto)}</span>`;
+      if (accion) {
+        const b = document.createElement('button');
+        b.textContent = accion.texto;
+        b.onclick = () => { t.classList.add('oculto'); accion.fn(); };
+        t.append(b);
+      }
+      t.classList.remove('oculto');
+      clearTimeout(tt);
+      tt = setTimeout(() => t.classList.add('oculto'), accion ? 12000 : 4000);
+    }
+
+    /* ---------- marcar el casillero con error ---------- */
+    const CAMPOS = {
+      nombre: '#p-nombre',
+      fecha_nacimiento: '#p-nac',
+      documento: '#p-doc',
+      telefono: '#p-tel',
+      correo: '#p-cor',
+      contacto_responsable: '#p-resp',
+      fecha: '#c-fecha',
+      hora: '#c-hora',
+      pin: '#l-pin'
+    };
+    const limpiarMarcas = c => document.querySelectorAll(c + ' [aria-invalid]').forEach(el => el.removeAttribute('aria-invalid'));
+    function marcarCampo(campo) {
+      const el = CAMPOS[campo] && $(CAMPOS[campo]);
+      if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); }
+    }
+
+    document.querySelectorAll('nav button').forEach(b => {
+      b.onclick = () => {
+        mostrarVista(b.dataset.v);
+        cargar();
+        if (b.dataset.v === 'auditoria') pintarAuditoria();
+      };
+    });
+
+    /* ---------- datos ---------- */
+    async function cargar() {
+      try {
+        datos = await api('/api/datos');
+      } catch (e) {
+        return e.estado === 401 ? null : aviso(e.mensaje);
+      }
+      sesion = datos.sesion;
+      aplicarSesion();
+      pintarSelects();
+      pintarCitas();
+      pintarPacientes();
+      resumen();
+    }
+
+    function pintarSelects() {
+      const sel = (id, items, ph) => {
+        const el = $(id), v = el.value;
+        el.innerHTML = `<option value="">${ph}</option>` + items.map(i => `<option value="${i.id}">${esc(i.nombre)}</option>`).join('');
+        if ([...el.options].some(o => o.value === v)) el.value = v;
+      };
+      filtrarPacientes();
+      sel('#c-medico', datos.medicos, 'Elija un médico');
+      sel('#c-clinica', datos.clinicas, 'Elija una clínica');
+
+      const f = $('#f-clinica'), v = f.value;
+      f.innerHTML = '<option value="">Todas las clínicas</option>' + datos.clinicas.map(c => `<option>${esc(c.nombre)}</option>`).join('');
+      f.value = v;
+
+      $('#c-fecha').min = hoyLocal();
+      $('#p-nac').max = hoyLocal();
+      $('#p-nac').min = String(new Date().getFullYear() - 120) + '-01-01';
+    }
+
+    function filtrarPacientes() {
+      const q = sinTildes($('#buscar').value.trim()), el = $('#c-paciente'), v = el.value;
+      const lista = datos.pacientes.filter(p => sinTildes(p.nombre).includes(q));
+      el.innerHTML = '<option value="">Elija un paciente</option>' + lista.map(p =>
+        `<option value="${p.id}">${esc(p.nombre)} · ${esc(p.fecha_nacimiento)}</option>`
+      ).join('');
+      if (lista.some(p => String(p.id) === v)) el.value = v;
+      else if (lista.length === 1) el.value = lista[0].id;
+      resumen();
+    }
+    $('#buscar').oninput = filtrarPacientes;
+
+    /* ---------- resumen en vivo de la cita ---------- */
+    function resumen() {
+      const txt = id => { const o = $(id).selectedOptions[0]; return o && o.value ? o.textContent : ''; };
+      const poner = (id, v) => { const e = $(id); e.textContent = v || 'Sin elegir'; e.classList.toggle('vacio-r', !v); };
+      poner('#r-paciente', txt('#c-paciente'));
+      poner('#r-medico', txt('#c-medico'));
+      poner('#r-clinica', txt('#c-clinica'));
+      $('#c-horario').textContent = textoHorario($('#c-clinica').value);
+      const f = $('#c-fecha').value, h = $('#c-hora').value;
+      poner('#r-cuando', f && h
+        ? new Date(f + 'T' + h).toLocaleString('es-EC', {
+            weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'
+          })
+        : '');
+    }
+    ['#c-paciente', '#c-medico', '#c-clinica', '#c-fecha', '#c-hora'].forEach(s => $(s).addEventListener('input', resumen));
+
+    /* ---------- agendar ---------- */
+    const textoSel = id => { const o = $(id).selectedOptions[0]; return o && o.value ? o.textContent : ''; };
+    $('#b-cita').onclick = async () => {
+      const b = $('#b-cita'), e = $('#e-cita');
+      e.textContent = '';
+      limpiarMarcas('#v-nueva');
+      b.disabled = true;
+
+      // 'clave' identifica este intento: si hay que reenviarlo por falta de internet, el servidor no duplica la cita.
+      const cuerpo = {
+        paciente_id: $('#c-paciente').value,
+        medico_id: $('#c-medico').value,
+        clinica_id: $('#c-clinica').value,
+        fecha: $('#c-fecha').value,
+        hora: $('#c-hora').value,
+        duracion: $('#c-dur').value,
+        clave: nuevaClave()
+      };
+
+      try {
+        await api('/api/citas', cuerpo);
+        aviso('✔ Cita agendada');
+        $('#c-hora').value = '';
+        await cargar();
+      } catch (x) {
+        if (x.offline && cuerpo.paciente_id && cuerpo.medico_id && cuerpo.clinica_id && cuerpo.fecha && cuerpo.hora) {
+          const l = leerPend();
+          l.push({
+            clave: cuerpo.clave,
+            cuerpo,
+            texto: `${textoSel('#c-paciente')} · ${cuerpo.fecha} ${cuerpo.hora} · ${textoSel('#c-clinica')}`
+          });
+          if (guardarPend(l)) {
+            aviso('Sin internet: la cita quedó guardada en este equipo, pero NO está confirmada todavía.');
+            $('#c-hora').value = '';
+            pintarPend();
+          } else {
+            e.textContent = x.mensaje + ' Además no se pudo guardar en este equipo: anote la cita en papel.';
+          }
+        } else {
+          e.textContent = x.mensaje;
+          marcarCampo(x.campo);
+        }
+      }
+      b.disabled = false;
+    };
+
+    /* ---------- lista de citas ---------- */
+    function pintarCitas() {
+      const filtro = $('#f-clinica').value, cont = $('#lista-citas');
+      const citas = datos.citas.filter(c => !filtro || c.clinica === filtro);
+      $('#s-activas').textContent = citas.filter(c => c.estado === 'activa').length;
+      $('#s-canceladas').textContent = citas.filter(c => c.estado === 'cancelada').length;
+      $('#s-hoy').textContent = citas.filter(c => c.estado === 'activa' && c.inicio.slice(0, 10) === hoyLocal()).length;
+
+      if (!citas.length) {
+        cont.innerHTML = '<div class="vacio">No hay citas próximas.</div>';
+        return;
+      }
+
+      let dia = '', html = '';
+      for (const c of citas) {
+        const d = new Date(c.inicio), clave = c.inicio.slice(0, 10);
+        if (clave !== dia) {
+          dia = clave;
+          html += `<div class="dia">${esc(d.toLocaleDateString('es-EC', { weekday: 'long', day: 'numeric', month: 'long' }))}</div>`;
+        }
+        const hora = c.inicio.slice(11, 16), cancel = c.estado === 'cancelada';
+        html += `
+          <div class="card cita ${claseSede(c.clinica)} ${cancel ? 'cancelada' : ''}">
+            <div class="hora">${hora}</div>
+            <div class="info">
+              <b>${esc(c.paciente)}</b>${cancel ? '<span class="chip">Cancelada</span>' : ''}
+              <small>${esc(c.medico)} · ${esc(c.clinica)}</small>
+            </div>
+            ${cancel
+              ? `<button type="button" class="chico ok" data-a="deshacer" data-id="${c.id}">Deshacer</button>`
+              : `<button type="button" class="chico peligro" data-a="cancelar" data-id="${c.id}">Cancelar cita</button>`}
+          </div>`;
+      }
+      cont.innerHTML = html;
+    }
+
+    $('#f-clinica').onchange = pintarCitas;
+    $('#lista-citas').onclick = async ev => {
+      const b = ev.target.closest('button[data-a]');
+      if (!b) return;
+      const id = b.dataset.id, accion = b.dataset.a;
+      if (accion === 'cancelar' && !confirm('¿Seguro que desea cancelar esta cita?\n(Podrá deshacerlo después.)')) return;
+      try {
+        const r = await api(`/api/citas/${id}/${accion}`, {});
+        aviso(r.mensaje, accion === 'cancelar' ? { texto: 'Deshacer', fn: () => accionCita(id, 'deshacer') } : null);
+      } catch (x) {
+        aviso(x.mensaje);
+      }
+      cargar();
+    };
+
+    async function accionCita(id, accion) {
+      try {
+        aviso((await api(`/api/citas/${id}/${accion}`, {})).mensaje);
+      } catch (x) {
+        aviso(x.mensaje);
+      }
+      cargar();
+    }
+
+    /* ---------- pacientes ---------- */
+    function ajustarDocumento() {
+      const tipo = $('#p-tipo').value, doc = $('#p-doc'), ayuda = $('#p-doc-ayuda');
+      $('#p-doc-box').classList.toggle('oculto', tipo === 'ninguno');
+      doc.removeAttribute('aria-invalid');
+      if (tipo === 'cedula') {
+        doc.inputMode = 'numeric';
+        doc.maxLength = 10;
+        doc.placeholder = '10 números';
+        ayuda.textContent = 'La cédula tiene 10 números, sin espacios.';
+        doc.value = doc.value.replace(/\D/g, '').slice(0, 10);
+      } else if (tipo === 'pasaporte') {
+        doc.inputMode = 'text';
+        doc.maxLength = 15;
+        doc.placeholder = 'Letras y números';
+        ayuda.textContent = 'El pasaporte tiene entre 5 y 15 letras o números, sin espacios.';
+        doc.value = doc.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 15);
+      }
+    }
+    $('#p-tipo').onchange = ajustarDocumento;
+    $('#p-doc').oninput = () => {
+      const d = $('#p-doc');
+      d.value = $('#p-tipo').value === 'cedula'
+        ? d.value.replace(/\D/g, '')
+        : d.value.replace(/[^A-Za-z0-9]/g, '');
+    };
+
+    async function guardarPaciente(confirmar) {
+      const e = $('#e-pac');
+      e.textContent = '';
+      limpiarMarcas('#v-pacientes');
+      $('#b-pac-igual').classList.add('oculto');
+
+      if (!$('#p-nombre').value.trim()) {
+        e.textContent = 'Escriba el nombre completo del paciente.';
+        return marcarCampo('nombre');
+      }
+      if (!$('#p-nac').value) {
+        e.textContent = 'Elija la fecha de nacimiento.';
+        return marcarCampo('fecha_nacimiento');
+      }
+
+      $('#b-pac').disabled = true;
+      try {
+        await api('/api/pacientes', {
+          nombre: $('#p-nombre').value,
+          fecha_nacimiento: $('#p-nac').value,
+          tipo_doc: $('#p-tipo').value,
+          documento: $('#p-doc').value,
+          telefono: $('#p-tel').value,
+          correo: $('#p-cor').value,
+          contacto_responsable: $('#p-resp').value,
+          confirmar_homonimo: confirmar
+        });
+        ['nombre', 'nac', 'doc', 'tel', 'cor', 'resp'].forEach(k => { $('#p-' + k).value = ''; });
+        aviso('✔ Paciente registrado');
+        await cargar();
+      } catch (x) {
+        e.textContent = x.mensaje;
+        marcarCampo(x.campo);
+        if (x.codigo === 'homonimo') $('#b-pac-igual').classList.remove('oculto');
+      }
+      $('#b-pac').disabled = false;
+    }
+
+    $('#b-pac').onclick = () => guardarPaciente(false);
+    $('#b-pac-igual').onclick = () => guardarPaciente(true);
+
+    function pintarPacientes() {
+      const ini = n => n.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+      $('#lista-pac').innerHTML = '<div class="dia">Pacientes registrados</div>' + (datos.pacientes.map(p => `
+        <div class="card pac">
+          <span class="avatar" aria-hidden="true">${esc(ini(p.nombre))}</span>
+          <div>
+            <b>${esc(p.nombre)}</b>
+            <small>
+              Nació el ${esc(p.fecha_nacimiento)} ·
+              ${p.tipo_doc === 'ninguno' ? 'sin documento' : esc(p.tipo_doc) + ' ' + esc(p.documento)}
+              ${p.telefono ? ' · Tel. ' + esc(p.telefono) : ''}
+              ${p.correo ? ' · ' + esc(p.correo) : ''}
+            </small>
+          </div>
+        </div>
+      `).join('') || '<div class="vacio">Aún no hay pacientes.</div>');
+    }
+
+    /* ---------- horario de cada clínica ---------- */
+    const DIA_CORTO = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    function textoHorario(id) {
+      const h = (datos.horarios || []).filter(x => String(x.clinica_id) === String(id));
+      if (!h.length) return '';
+      const g = [];
+      for (const x of h) {
+        const k = x.abre + '–' + x.cierra, u = g[g.length - 1];
+        if (u && u.k === k && u.fin === x.dia_semana - 1) u.fin = x.dia_semana;
+        else g.push({ k, ini: x.dia_semana, fin: x.dia_semana });
+      }
+      return 'Atiende: ' + g.map(x =>
+        (x.ini === x.fin ? DIA_CORTO[x.ini] : DIA_CORTO[x.ini] + ' a ' + DIA_CORTO[x.fin]) + ' ' + x.k
+      ).join(' · ');
+    }
+
+    /* ---------- ingreso con PIN ---------- */
+    async function pedirLogin() {
+      sesion = null;
+      aplicarSesion();
+      try {
+        const u = await api('/api/usuarios');
+        $('#l-usuario').innerHTML = u.usuarios.map(n => `<option>${esc(n)}</option>`).join('');
+      } catch (e) {
+        $('#e-login').textContent = e.mensaje;
+      }
+      $('#l-pin').value = '';
+      $('#login').classList.remove('oculto');
+      $('#l-pin').focus();
+    }
+
+    async function entrar() {
+      const b = $('#b-login');
+      b.disabled = true;
+      $('#e-login').textContent = '';
+      limpiarMarcas('#login');
+      try {
+        await api('/api/login', { nombre: $('#l-usuario').value, pin: $('#l-pin').value });
+        $('#login').classList.add('oculto');
+        $('#l-pin').value = '';
+        await cargar();
+        reenviarPendientes();
+      } catch (x) {
+        $('#e-login').textContent = x.mensaje;
+        marcarCampo(x.campo);
+        $('#l-pin').select();
+      }
+      b.disabled = false;
+    }
+
+    $('#b-login').onclick = entrar;
+    $('#l-pin').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+
+    function aplicarSesion() {
+      $('#u-nombre').textContent = sesion ? sesion.nombre : '';
+      $('#u-rol').textContent = sesion ? (sesion.rol === 'doctora' ? 'Acceso completo' : 'Recepción') : '';
+      $('#nav-auditoria').classList.toggle('oculto', !(sesion && sesion.rol === 'doctora'));
+      if (!sesion || sesion.rol !== 'doctora') $('#v-auditoria').classList.add('oculto');
+    }
+
+    $('#b-salir').onclick = async () => {
+      try { await api('/api/logout', {}); } catch (e) {}
+      mostrarVista('nueva');
+      pedirLogin();
+    };
+
+    /* ---------- historial de cambios (solo doctora) ---------- */
+    const ACCIONES = {
+      crear: 'Registró un paciente',
+      agendar: 'Agendó una cita',
+      cancelar: 'Canceló una cita',
+      reactivar: 'Reactivó una cita',
+      ingresar: 'Ingresó al sistema',
+      ingreso_fallido: 'Intento de ingreso con PIN incorrecto'
+    };
+
+    async function pintarAuditoria() {
+      const cont = $('#lista-aud');
+      try {
+        const r = await api('/api/auditoria');
+        cont.innerHTML = r.eventos.map(e => `
+          <div class="card evento ${e.accion === 'ingreso_fallido' ? 'malo' : ''}">
+            <time>${esc(new Date(e.cuando).toLocaleString('es-EC', {
+              day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+            }))}</time>
+            <div><b>${esc(e.usuario)}</b> · ${esc(ACCIONES[e.accion] || e.accion)}</div>
+            ${(e.entidad === 'cita' || e.entidad === 'paciente')
+              ? `<small>${esc(e.entidad)} n.º ${esc(e.entidad_id)}${e.detalle ? ' · ' + esc(e.detalle) : ''}</small>`
+              : ''}
+          </div>
+        `).join('') || '<div class="vacio">Todavía no hay movimientos.</div>';
+      } catch (x) {
+        cont.innerHTML = `<div class="vacio">${esc(x.mensaje)}</div>`;
+      }
+    }
+
+    /* ---------- citas pendientes cuando se cae el internet (Clínica Sur) ---------- */
+    const LLAVE_PEND = 'msls_pendientes';
+    const leerPend = () => {
+      try { return JSON.parse(localStorage.getItem(LLAVE_PEND) || '[]'); } catch (e) { return []; }
+    };
+    const guardarPend = l => {
+      try { localStorage.setItem(LLAVE_PEND, JSON.stringify(l)); return true; } catch (e) { return false; }
+    };
+    const nuevaClave = () => (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+
+    function pintarPend() {
+      const l = leerPend(), box = $('#pendientes');
+      box.classList.toggle('oculto', !l.length);
+      box.innerHTML = !l.length
+        ? ''
+        : `<b>⏳ ${l.length} cita(s) guardada(s) en este equipo, SIN confirmar todavía</b>
+           <small>Se enviarán solas cuando vuelva el internet. Hasta entonces la hora NO está reservada.</small>`
+          + l.map(p => `
+              <div class="pend-fila">
+                <span>${esc(p.texto)}${p.error ? `<br><em>No se pudo confirmar: ${esc(p.error)}</em>` : ''}</span>
+                <button type="button" class="chico" data-clave="${esc(p.clave)}">Descartar</button>
+              </div>
+            `).join('')
+          + '<button type="button" class="chico" id="b-reintentar" style="margin-top:10px">Reintentar ahora</button>';
+    }
+
+    $('#pendientes').onclick = ev => {
+      if (ev.target.id === 'b-reintentar') return reenviarPendientes();
+      const c = ev.target.dataset && ev.target.dataset.clave;
+      if (c) { guardarPend(leerPend().filter(p => p.clave !== c)); pintarPend(); }
+    };
+
+    let enviando = false;
+    async function reenviarPendientes() {
+      if (enviando || !sesion) return;
+      enviando = true;
+      let enviado = false, l = leerPend();
+      for (const p of l) {
+        if (p.error) continue;
+        try {
+          await api('/api/citas', p.cuerpo);
+          l = l.filter(x => x.clave !== p.clave);
+          guardarPend(l);
+          enviado = true;
+          aviso('✔ Se confirmó la cita pendiente: ' + p.texto);
+        } catch (x) {
+          if (x.offline || x.estado === 401) break;
+          p.error = x.mensaje;
+          guardarPend(l); // el servidor la rechazó (ej. la hora ya fue tomada): que una persona decida
+        }
+      }
+      enviando = false;
+      pintarPend();
+      if (enviado) cargar();
+    }
+
+    window.addEventListener('online', reenviarPendientes);
+    setInterval(() => { if (leerPend().some(p => !p.error)) reenviarPendientes(); }, 30000);
+    pintarPend();
+  </script>
+</body>
+</html>
