@@ -1,0 +1,15 @@
+# Datos: la base y los respaldos pueden contener información de pacientes. NUNCA al repositorio.
+*.db
+*.db-wal
+*.db-shm
+respaldos/
+importacion_informe*.csv
+
+# Secretos
+.env
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.pyc

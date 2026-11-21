@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 400" role="img" aria-label="Calendario con cruz médica">
+  <rect width="480" height="400" rx="18" fill="#e8f1f8"/>
+  <circle cx="400" cy="70" r="90" fill="#d7e7f3"/>
+  <circle cx="60" cy="350" r="70" fill="#d7e7f3"/>
+  <rect x="90" y="70" width="300" height="270" rx="14" fill="#fff" stroke="#c9dbe8" stroke-width="2"/>
+  <path d="M90 84a14 14 0 0 1 14-14h272a14 14 0 0 1 14 14v46H90z" fill="#0d7377"/>
+  <rect x="140" y="52" width="10" height="36" rx="5" fill="#5b8db8"/>
+  <rect x="330" y="52" width="10" height="36" rx="5" fill="#5b8db8"/>
+  <g fill="#e3ecf2">
+    <rect x="118" y="152" width="36" height="28" rx="6"/><rect x="170" y="152" width="36" height="28" rx="6"/>
+    <rect x="222" y="152" width="36" height="28" rx="6"/><rect x="274" y="152" width="36" height="28" rx="6"/>
+    <rect x="326" y="152" width="36" height="28" rx="6"/>
+    <rect x="118" y="196" width="36" height="28" rx="6"/><rect x="170" y="196" width="36" height="28" rx="6"/>
+    <rect x="274" y="196" width="36" height="28" rx="6"/><rect x="326" y="196" width="36" height="28" rx="6"/>
+    <rect x="118" y="240" width="36" height="28" rx="6"/><rect x="222" y="240" width="36" height="28" rx="6"/>
+    <rect x="274" y="240" width="36" height="28" rx="6"/>
+  </g>
+  <rect x="222" y="196" width="36" height="28" rx="6" fill="#0d7377"/>
+  <path d="M232 210l6 6 10-12" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="352" cy="286" r="44" fill="#fff" stroke="#c9dbe8" stroke-width="2"/>
+  <path d="M352 266v40M332 286h40" stroke="#0d7377" stroke-width="12" stroke-linecap="round"/>
+</svg>
